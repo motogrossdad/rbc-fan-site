@@ -4,32 +4,44 @@
   const y = document.getElementById('year');
   if (y) y.textContent = new Date().getFullYear();
 
-  // Very visible fallback avatar (light on dark)
-  const FALLBACK_DATA_URI =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">
-        <rect width="100%" height="100%" fill="#eef2f7"/>
-        <circle cx="150" cy="120" r="70" fill="#cfd7ea"/>
-        <rect x="70" y="210" width="160" height="50" rx="25" fill="#cfd7ea"/>
-      </svg>`
-    );
+  // Create a deterministic color from a seed (player name + number)
+  function colorFromSeed(seed) {
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+    const hue = h % 360;
+    return `hsl(${hue} 60% 40%)`;
+  }
 
-  // If a player has no photo, use a deterministic picsum so caching isn't a problem
-  const fallbackPhotoFor = (seed) => `https://picsum.photos/seed/${encodeURIComponent(seed || 'rbc')}/300`;
+  // Make an SVG initials avatar (data URI)
+  function initialsAvatar(name = "Player", seed = "rbc") {
+    const parts = name.trim().split(/\s+/);
+    const initials = (parts[0]?.[0] || "") + (parts[parts.length - 1]?.[0] || "");
+    const bg = colorFromSeed(seed);
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+        <rect width="100%" height="100%" fill="${bg}"/>
+        <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle"
+              font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+              font-weight="800" font-size="220" fill="white">${initials.toUpperCase()}</text>
+      </svg>`;
+    return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+  }
 
-  function makeImg(src, alt) {
+  // Build an <img> element that uses a photo if present else initials avatar
+  function makeImgForPlayer(p, idx) {
+    const seed = `${p?.name ?? "Player"}-${p?.number ?? idx}`;
+    const src = (p?.photo && /^https?:\/\//.test(p.photo)) ? p.photo : initialsAvatar(p?.name, seed);
     const img = document.createElement('img');
     img.loading = 'lazy';
     img.decoding = 'async';
-    img.alt = alt || '';
-    img.src = src || FALLBACK_DATA_URI;
-    // show a border so you can see the image box even on dark cards
+    img.alt = p?.name || 'Player';
+    img.src = src;
     Object.assign(img.style, {
       width: '100%', borderRadius: '.6rem', marginBottom: '.5rem',
-      aspectRatio: '1 / 1', objectFit: 'cover', border: '1px solid rgba(0,0,0,.08)'
+      aspectRatio: '1 / 1', objectFit: 'cover', border: '1px solid rgba(255,255,255,.1)'
     });
-    img.addEventListener('error', () => { img.src = FALLBACK_DATA_URI; });
+    // If external photo fails, fall back to initials avatar
+    img.addEventListener('error', () => { img.src = initialsAvatar(p?.name, seed); });
     return img;
   }
 
@@ -38,14 +50,11 @@
     if (!container) return;
 
     try {
-      // Important: no-store & unique query kill stale cache on GitHub Pages
+      // Bust cache to make sure latest players.json is fetched
       const res = await fetch(`./data/players.json?v=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`players.json HTTP ${res.status}`);
       const data = await res.json();
-
-      if (!data || !Array.isArray(data.players)) {
-        throw new Error('players.json missing "players" array');
-      }
+      if (!data || !Array.isArray(data.players)) throw new Error('Missing "players" array');
 
       const players = data.players.slice().sort((a, b) => (a.number || 0) - (b.number || 0));
       container.innerHTML = '';
@@ -54,14 +63,9 @@
         const card = document.createElement('div');
         card.className = 'player';
 
-        const safeName = p?.name ?? `Player ${i + 1}`;
-        const imgUrl = p?.photo && String(p.photo).startsWith('http')
-          ? p.photo
-          : fallbackPhotoFor(`${safeName}-${p?.number ?? i}`);
-
-        const img = makeImg(imgUrl, safeName);
+        const img = makeImgForPlayer(p, i);
         const badge = `<span class="badge">${p?.position ?? ''}</span>`;
-        const title = `<h3>#${p?.number ?? ''} ${safeName}</h3>`;
+        const title = `<h3>#${p?.number ?? ''} ${p?.name ?? ''}</h3>`;
         const meta = `<p class="muted">${p?.nationality ?? ''}</p>`;
 
         card.appendChild(img);
@@ -74,18 +78,11 @@
       }
     } catch (err) {
       console.error('[RBC] Failed to load players:', err);
-      const container = document.getElementById('squad-list');
-      if (container) {
-        container.innerHTML = `
-          <p class="muted">
-            Couldn’t load players. Ensure <span class="code">/data/players.json</span> exists,
-            is valid JSON, and this site has that exact path.
-          </p>`;
-      }
+      container.innerHTML = `<p class="muted">Couldn’t load players. Make sure <span class="code">data/players.json</span> exists and is valid JSON.</p>`;
     }
   }
 
-  // Simple news placeholder
+  // News placeholder
   function loadNews() {
     const list = document.getElementById('news-list');
     const stamp = document.getElementById('news-date');
