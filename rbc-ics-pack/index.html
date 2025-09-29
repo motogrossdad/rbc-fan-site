@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RBC Roosendaal 25/26</title>
+  <meta name="description" content="RBC Roosendaal 25/26: Standings, Results, Squad and Calendar." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0b1020; --card:#141a2f; --accent:#ff8c00; --muted:#94a3b8; --text:#e5e7eb; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height:1.5; }
+
+    header { position:sticky; top:0; backdrop-filter: blur(8px); background: rgba(11,16,32,.7); border-bottom:1px solid rgba(255,255,255,.06); z-index:10; }
+    nav { max-width: 1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding: .75rem 1rem; }
+    .brand { display:flex; gap:.6rem; align-items:center; font-weight:800; letter-spacing:.3px; font-size:1rem; }
+    .brand .dot { width:10px;height:10px;background:var(--accent);border-radius:50%;display:inline-block }
+    .links a { color: var(--text); text-decoration:none; margin-left:.75rem; font-weight:600; opacity:.9; padding:.4rem .6rem; border-radius:.5rem; display:inline-block; }
+    .links a:hover { opacity:1; background: rgba(255,255,255,.06); }
+
+    .hero { max-width:1100px; margin: 1rem auto; padding: 1rem; }
+    .hero h1 { font-size: clamp(1.6rem, 6vw, 3rem); margin:.2rem 0 .2rem }
+
+    .grid { display:grid; grid-template-columns: 1fr; gap:1rem; max-width:1100px; margin: 1rem auto 3rem; padding:0 1rem }
+    @media (min-width: 960px) { .grid { grid-template-columns: repeat(12, 1fr); } .card.span-12 { grid-column: span 12; } .card.half { grid-column: span 6; } }
+    .card { background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:1.1rem; padding:1rem; }
+    .card h2 { margin:.2rem 0 .8rem; font-size:1.25rem }
+    .subtle { color: var(--muted); font-size:.92rem }
+
+    /* Teletext */
+    .tt-title { margin:.2rem 0 .6rem; font-size:1.05rem; color: var(--muted); }
+    .iframe-viewport { width: 100%; height: 560px; overflow: hidden; border-radius: .8rem; background: #0e1224; border: 0; position: relative; }
+    .iframe-viewport iframe { width: 100%; height: 1000px; border: 0; transform-origin: top center; --zoom: 1.22; --offsetY: -58px; transform: translateY(var(--offsetY)) scale(var(--zoom)); }
+    @media (max-width: 640px) { .iframe-viewport { height: 220px; } .iframe-viewport iframe { height: 900px; --zoom: 0.48; --offsetY: 0px; transform: translateY(var(--offsetY)) scale(var(--zoom)); } }
+
+    /* Fixtures (ICS) */
+    .fixtures-controls { display:flex; gap:.5rem; margin:.5rem 0 1rem; flex-wrap:wrap; }
+    .fx-btn { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color: var(--text); padding:.45rem .7rem; border-radius:.6rem; cursor:pointer; font-weight:700; }
+    .fx-btn.active { background: var(--accent); color:#1b1203; border-color: transparent; }
+    .fixtures { list-style:none; padding:0; margin:0; display:grid; gap:.6rem; }
+    .fixture { display:grid; grid-template-columns: 100px 1fr; gap:.75rem; align-items:center; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:.8rem; padding:.7rem; }
+    .fx-date { text-align:center; line-height:1.2; }
+    .fx-date .d { font-size:1.25rem; font-weight:800; }
+    .fx-date .m { font-size:.9rem; color: var(--muted); text-transform: uppercase; letter-spacing:.04em; }
+    .fx-body { min-width:0; }
+    .fx-title { font-weight:700; margin:0 0 .15rem; }
+    .fx-meta { margin:0; color: var(--muted); font-size:.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    @media (max-width: 520px) { .fixture { grid-template-columns: 80px 1fr; } .fx-date .d { font-size:1.1rem; } }
+
+    /* Squad */
+    .squad { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .9rem; }
+    @media (min-width: 600px) { .squad { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
+    .player { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius:.9rem; padding:.8rem }
+    .player h3 { margin:.2rem 0 .3rem; font-size:1rem; line-height:1.25; }
+    .badge { display:inline-block; background: rgba(255,140,0,.12); color: var(--accent); padding:.2rem .5rem; border-radius:.6rem; font-weight:700; font-size:.78rem }
+    .muted { color: var(--muted) }
+
+    iframe.calendar { width:100%; border:0; border-radius:.8rem; min-height: 540px; background:#0e1224 }
+    footer { text-align:center; color: var(--muted); padding:2rem 1rem; border-top:1px solid rgba(255,255,255,.06) }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="brand"><span class="dot"></span> RBC Roosendaal</div>
+      <div class="links">
+        <a href="#tables">Tables</a>
+        <a href="#fixtures-ics">Fixtures</a>
+        <a href="#squad">Squad</a>
+        <a href="#calendar">Calendar</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>RBC ROOSENDAAL 25/26</h1>
+  </section>
+
+  <main class="grid">
+    <section class="card span-12" id="tables">
+      <h2>Tables</h2>
+      <div>
+        <div class="tt-title">Standings</div>
+        <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Standings" loading="lazy"></iframe></div>
+      </div>
+      <div style="height:1rem"></div>
+      <div>
+        <div class="tt-title">Results</div>
+        <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Results" loading="lazy"></iframe></div>
+      </div>
+    </section>
+
+    <!-- ICS Fixtures -->
+    <section class="card span-12" id="fixtures-ics">
+      <h2>Fixtures</h2>
+      <div class="fixtures-controls" role="tablist" aria-label="Fixtures filter">
+        <button class="fx-btn active" role="tab" aria-selected="true" data-view="upcoming">Upcoming</button>
+        <button class="fx-btn" role="tab" aria-selected="false" data-view="past">Past</button>
+        <button class="fx-btn" role="tab" aria-selected="false" data-view="all">All</button>
+      </div>
+      <ul id="fixtures-list" class="fixtures"></ul>
+      <p id="fixtures-empty" class="muted" style="display:none">No fixtures to show.</p>
+    </section>
+
+    <section class="card span-12" id="squad">
+      <h2>Squad</h2>
+      <div class="squad" id="squad-list" aria-live="polite"></div>
+    </section>
+
+    <section class="card half" id="calendar">
+      <h2>Calendar</h2>
+      <iframe class="calendar" title="RBC calendar" src="https://calendar.google.com/calendar/embed?src=c_2e7651f3f16f0e62467db879e30ae3d1b1a57e1d5e4c2d0a9f1a1b3a4c5%40group.calendar.google.com&ctz=Europe%2FAmsterdam"></iframe>
+    </section>
+
+    <section class="card half">
+      <h2>About</h2>
+      <p class="subtle">Unofficial fan site for RBC Roosendaal.</p>
+    </section>
+  </main>
+
+  <footer>
+    © <span id="year"></span> RBC Roosendaal
+  </footer>
+
+  <script src="./assets/script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/ical.js@1.4.0/build/ical.min.js"></script>
+  <script>
+    (function(){ const y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear(); })();
+    (async function initFixtures(){
+      const listEl=document.getElementById('fixtures-list'); const emptyEl=document.getElementById('fixtures-empty');
+      const controls=document.querySelectorAll('#fixtures-ics .fx-btn'); if(!listEl) return;
+      const ICS_URL='./data/rbc.ics'; const tz='Europe/Amsterdam';
+      const fmt=(d)=>new Intl.DateTimeFormat('nl-NL',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:tz}).format(d);
+      const mLabel=(d)=>new Intl.DateTimeFormat('nl-NL',{month:'short',timeZone:tz}).format(d);
+      const dLabel=(d)=>new Intl.DateTimeFormat('nl-NL',{day:'2-digit',timeZone:tz}).format(d);
+      function render(fixtures,view='upcoming'){
+        const now=new Date(); let data=fixtures.slice();
+        if(view==='upcoming') data=data.filter(f=>f.start>=now);
+        if(view==='past') data=data.filter(f=>f.start<now);
+        data.sort((a,b)=>a.start-b.start);
+        listEl.innerHTML=''; if(!data.length){ emptyEl.style.display=''; return; } emptyEl.style.display='none';
+        const frag=document.createDocumentFragment();
+        data.forEach(ev=>{
+          const li=document.createElement('li'); li.className='fixture';
+          const date=document.createElement('div'); date.className='fx-date';
+          date.innerHTML=`<div class="d">${dLabel(ev.start)}</div><div class="m">${mLabel(ev.start)}</div>`;
+          const body=document.createElement('div'); body.className='fx-body';
+          const t=document.createElement('p'); t.className='fx-title'; t.textContent=ev.summary||'Fixture';
+          const meta=document.createElement('p'); meta.className='fx-meta'; meta.textContent=fmt(ev.start)+(ev.location?' · '+ev.location:'');
+          body.append(t,meta); li.append(date,body); frag.append(li);
+        });
+        listEl.append(frag);
+      }
+      function wireControls(fixtures){
+        controls.forEach(btn=>{ btn.addEventListener('click',()=>{
+          controls.forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+          btn.classList.add('active'); btn.setAttribute('aria-selected','true'); render(fixtures, btn.dataset.view);
+        });});
+      }
+      try{
+        const res=await fetch(ICS_URL+'?v='+Date.now(),{cache:'no-store'});
+        if(!res.ok) throw new Error('ICS '+res.status);
+        const ics=await res.text();
+        const jcal=ICAL.parse(ics);
+        const comp=new ICAL.Component(jcal);
+        const fixtures=comp.getAllSubcomponents('vevent').map(ve=>{
+          const ev=new ICAL.Event(ve);
+          return { summary:ev.summary, location:ev.location||'', start:ev.startDate.toJSDate(), end:ev.endDate?ev.endDate.toJSDate():null };
+        }).filter(f=>f.start instanceof Date && !isNaN(f.start));
+        wireControls(fixtures);
+        render(fixtures,'upcoming');
+      }catch(e){
+        console.error('[RBC] Fixtures load failed', e);
+        listEl.innerHTML=''; emptyEl.textContent='Kon fixtures niet laden.'; emptyEl.style.display='';
+      }
+    })();
+  </script>
+</body>
+</html>
