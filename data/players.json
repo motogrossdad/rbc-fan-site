@@ -1,0 +1,28 @@
+{
+  "players": [
+    {
+      "number": 1,
+      "name": "Goalkeeper One",
+      "position": "GK",
+      "nationality": "NL"
+    },
+    {
+      "number": 4,
+      "name": "Defender Two",
+      "position": "DF",
+      "nationality": "NL"
+    },
+    {
+      "number": 6,
+      "name": "Midfielder Three",
+      "position": "MF",
+      "nationality": "NL"
+    },
+    {
+      "number": 9,
+      "name": "Forward Four",
+      "position": "FW",
+      "nationality": "NL"
+    }
+  ]
+}

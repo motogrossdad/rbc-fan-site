@@ -1,0 +1,8 @@
+{
+  "name": "rbc-fan-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "echo 'Open index.html in your browser'"
+  }
+}
