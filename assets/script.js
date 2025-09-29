@@ -4,7 +4,7 @@
   const y = document.getElementById('year');
   if (y) y.textContent = new Date().getFullYear();
 
-  // Create a deterministic color from a seed (player name + number)
+  // Deterministic color from a seed (player name + number)
   function colorFromSeed(seed) {
     let h = 0;
     for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
@@ -12,64 +12,93 @@
     return `hsl(${hue} 60% 40%)`;
   }
 
-  // Make an SVG initials avatar (data URI)
-  function initialsAvatar(name = "Player", seed = "rbc") {
+  // Make an SVG <svg> element with initials (no external requests)
+  function svgInitialsElement(name = "Player", seed = "rbc") {
     const parts = name.trim().split(/\s+/);
-    const initials = (parts[0]?.[0] || "") + (parts[parts.length - 1]?.[0] || "");
+    const initials = ((parts[0]?.[0] || "") + (parts[parts.length - 1]?.[0] || "")).toUpperCase();
     const bg = colorFromSeed(seed);
-    const svg = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">
-        <rect width="100%" height="100%" fill="${bg}"/>
-        <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle"
-              font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-              font-weight="800" font-size="220" fill="white">${initials.toUpperCase()}</text>
-      </svg>`;
-    return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 600 600");
+    svg.setAttribute("width", "600");
+    svg.setAttribute("height", "600");
+    Object.assign(svg.style, {
+      width: "100%", borderRadius: ".6rem", marginBottom: ".5rem",
+      aspectRatio: "1 / 1", objectFit: "cover", display: "block",
+      border: "1px solid rgba(255,255,255,.1)"
+    });
+
+    const rect = document.createElementNS(svgNS, "rect");
+    rect.setAttribute("width", "600");
+    rect.setAttribute("height", "600");
+    rect.setAttribute("fill", bg);
+
+    const text = document.createElementNS(svgNS, "text");
+    text.setAttribute("x", "300");
+    text.setAttribute("y", "312");
+    text.setAttribute("text-anchor", "middle");
+    text.setAttribute("dominant-baseline", "middle");
+    text.setAttribute("font-family", "Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif");
+    text.setAttribute("font-weight", "800");
+    text.setAttribute("font-size", "220");
+    text.setAttribute("fill", "white");
+    text.textContent = initials || "??";
+
+    svg.appendChild(rect);
+    svg.appendChild(text);
+    return svg;
   }
 
-  // Build an <img> element that uses a photo if present else initials avatar
-  function makeImgForPlayer(p, idx) {
+  // Prefer p.photo (http/https). If missing, use inline SVG initials.
+  function makePortrait(p, idx) {
     const seed = `${p?.name ?? "Player"}-${p?.number ?? idx}`;
-    const src = (p?.photo && /^https?:\/\//.test(p.photo)) ? p.photo : initialsAvatar(p?.name, seed);
-    const img = document.createElement('img');
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.alt = p?.name || 'Player';
-    img.src = src;
+    const hasPhoto = p?.photo && /^https?:\/\//.test(p.photo);
+
+    if (!hasPhoto) return svgInitialsElement(p?.name, seed);
+
+    const img = document.createElement("img");
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.alt = p?.name || "Player";
+    img.src = p.photo;
     Object.assign(img.style, {
-      width: '100%', borderRadius: '.6rem', marginBottom: '.5rem',
-      aspectRatio: '1 / 1', objectFit: 'cover', border: '1px solid rgba(255,255,255,.1)'
+      width: "100%", borderRadius: ".6rem", marginBottom: ".5rem",
+      aspectRatio: "1 / 1", objectFit: "cover", border: "1px solid rgba(255,255,255,.1)"
     });
-    // If external photo fails, fall back to initials avatar
-    img.addEventListener('error', () => { img.src = initialsAvatar(p?.name, seed); });
+    img.addEventListener("error", () => {
+      // If external photo fails, fallback to SVG initials (guaranteed to render)
+      const svg = svgInitialsElement(p?.name, seed);
+      img.replaceWith(svg);
+    });
     return img;
   }
 
   async function loadPlayers() {
-    const container = document.getElementById('squad-list');
+    const container = document.getElementById("squad-list");
     if (!container) return;
 
     try {
-      // Bust cache to make sure latest players.json is fetched
-      const res = await fetch(`./data/players.json?v=${Date.now()}`, { cache: 'no-store' });
+      // Bust cache to avoid stale JSON on GitHub Pages
+      const res = await fetch(`./data/players.json?v=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error(`players.json HTTP ${res.status}`);
       const data = await res.json();
       if (!data || !Array.isArray(data.players)) throw new Error('Missing "players" array');
 
       const players = data.players.slice().sort((a, b) => (a.number || 0) - (b.number || 0));
-      container.innerHTML = '';
+      container.innerHTML = "";
 
       players.forEach((p, i) => {
-        const card = document.createElement('div');
-        card.className = 'player';
+        const card = document.createElement("div");
+        card.className = "player";
 
-        const img = makeImgForPlayer(p, i);
-        const badge = `<span class="badge">${p?.position ?? ''}</span>`;
-        const title = `<h3>#${p?.number ?? ''} ${p?.name ?? ''}</h3>`;
-        const meta = `<p class="muted">${p?.nationality ?? ''}</p>`;
+        const portrait = makePortrait(p, i);
+        const badge = `<span class="badge">${p?.position ?? ""}</span>`;
+        const title = `<h3>#${p?.number ?? ""} ${p?.name ?? ""}</h3>`;
+        const meta = `<p class="muted">${p?.nationality ?? ""}</p>`;
 
-        card.appendChild(img);
-        card.insertAdjacentHTML('beforeend', `${badge}${title}${meta}`);
+        card.appendChild(portrait);
+        card.insertAdjacentHTML("beforeend", `${badge}${title}${meta}`);
         container.appendChild(card);
       });
 
@@ -77,21 +106,21 @@
         container.innerHTML = `<p class="muted">No players found. Check <span class="code">data/players.json</span>.</p>`;
       }
     } catch (err) {
-      console.error('[RBC] Failed to load players:', err);
+      console.error("[RBC] Failed to load players:", err);
       container.innerHTML = `<p class="muted">Couldn’t load players. Make sure <span class="code">data/players.json</span> exists and is valid JSON.</p>`;
     }
   }
 
-  // News placeholder
+  // Simple news placeholder
   function loadNews() {
-    const list = document.getElementById('news-list');
-    const stamp = document.getElementById('news-date');
+    const list = document.getElementById("news-list");
+    const stamp = document.getElementById("news-date");
     if (!list) return;
     const items = [
-      { title: 'RBC update', url: 'https://www.rbcvoetbal.nl/', date: new Date().toISOString().slice(0, 10) }
+      { title: "RBC update", url: "https://www.rbcvoetbal.nl/", date: new Date().toISOString().slice(0, 10) }
     ];
-    if (stamp) stamp.textContent = `Last refreshed: ${new Date().toLocaleString('nl-NL', { timeZone: 'Europe/Amsterdam' })}`;
-    list.innerHTML = items.map(n => `<li><a target="_blank" href="${n.url}">${n.title}</a> <span class="muted">(${n.date})</span></li>`).join('');
+    if (stamp) stamp.textContent = `Last refreshed: ${new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" })}`;
+    list.innerHTML = items.map(n => `<li><a target="_blank" href="${n.url}">${n.title}</a> <span class="muted">(${n.date})</span></li>`).join("");
   }
 
   loadPlayers();
