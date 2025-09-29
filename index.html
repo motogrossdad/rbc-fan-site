@@ -40,6 +40,13 @@
     .muted { color: var(--muted) }
     .note { font-size:.9rem; color: var(--muted); margin-top:.5rem }
     .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; }
+
+    /* Tabs for results/standings */
+    .tabs { display:flex; gap:.5rem; margin: .5rem 0 1rem; }
+    .tab { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color: var(--text); padding:.5rem .8rem; border-radius:.6rem; cursor:pointer; font-weight:700; }
+    .tab[aria-selected="true"] { background: var(--accent); color:#1b1203; border-color:transparent; }
+    .panel { display:none; }
+    .panel.active { display:block; }
   </style>
 </head>
 <body>
@@ -77,17 +84,30 @@
   <main class="grid">
     <article class="card" id="fixtures">
       <h2>Fixtures &amp; Results</h2>
-      <p class="subtle">Live view via <span class="code">derde-divisie.nl</span>. If the embed is blocked by the site, use the button below to open it directly.</p>
+      <p class="subtle">Powered by NOS Teletekst. Use tabs to switch between <strong>Results</strong> and <strong>Standings</strong>.</p>
 
-      <!-- Embedded external site -->
-      <iframe 
-        src="https://derde-divisie.nl/" 
-        title="Derde Divisie Fixtures & Results"
-        style="width:100%; min-height:800px; border:0; border-radius:0.8rem;">
-      </iframe>
-      <p class="note">
-        If the fixtures don’t display above, <a class="btn" target="_blank" href="https://derde-divisie.nl/">open derde-divisie.nl directly</a>.
-      </p>
+      <div class="tabs" role="tablist" aria-label="Results and Standings">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="panel-results" id="tab-results">Results</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-standings" id="tab-standings">Standings</button>
+      </div>
+
+      <div id="panel-results" class="panel active" role="tabpanel" aria-labelledby="tab-results">
+        <iframe 
+          src="https://teletekst-data.nos.nl/webplus?p=835-1"
+          title="NOS Teletekst — Results"
+          style="width:100%; min-height:800px; border:0; border-radius:.8rem;">
+        </iframe>
+        <p class="note">If the embed doesn’t show, <a target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-1">open Results on NOS Teletekst</a>.</p>
+      </div>
+
+      <div id="panel-standings" class="panel" role="tabpanel" aria-labelledby="tab-standings">
+        <iframe 
+          src="https://teletekst-data.nos.nl/webplus?p=835-2"
+          title="NOS Teletekst — Standings"
+          style="width:100%; min-height:800px; border:0; border-radius:.8rem;">
+        </iframe>
+        <p class="note">If the embed doesn’t show, <a target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-2">open Standings on NOS Teletekst</a>.</p>
+      </div>
     </article>
 
     <article class="card" id="squad">
@@ -122,5 +142,19 @@
   </footer>
 
   <script src="./assets/script.js" defer></script>
+  <script>
+    // Simple tabs for Results/Standings
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.setAttribute('aria-selected', 'true');
+        const panel = document.getElementById(tab.getAttribute('aria-controls'));
+        panel.classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>
