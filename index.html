@@ -26,9 +26,7 @@
     .btn.secondary { background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--text) }
     .grid { display:grid; grid-template-columns: repeat(12, 1fr); gap:1rem; max-width:1100px; margin: 1rem auto 3rem; padding:0 1rem }
     .card { grid-column: span 12; background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:1.1rem; padding:1rem; }
-    @media (min-width: 960px) {
-      .card.half { grid-column: span 6; }
-    }
+    @media (min-width: 960px) { .card.half { grid-column: span 6; } }
     .card h2 { margin-top:.4rem; font-size:1.25rem }
     .subtle { color: var(--muted); font-size:.92rem }
     iframe { width:100%; border:0; border-radius:.8rem; min-height: 540px; background:#0e1224 }
@@ -40,13 +38,17 @@
     .muted { color: var(--muted) }
     .note { font-size:.9rem; color: var(--muted); margin-top:.5rem }
     .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; }
-
-    /* Tabs for results/standings */
     .tabs { display:flex; gap:.5rem; margin: .5rem 0 1rem; }
     .tab { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color: var(--text); padding:.5rem .8rem; border-radius:.6rem; cursor:pointer; font-weight:700; }
     .tab[aria-selected="true"] { background: var(--accent); color:#1b1203; border-color:transparent; }
     .panel { display:none; }
     .panel.active { display:block; }
+    .iframe-viewport { width:100%; height:800px; overflow:hidden; border-radius:.8rem; background:#0e1224; border:0; position:relative; }
+    .iframe-viewport iframe {
+      width:100%; height:1000px; border:0; transform-origin: top center;
+      --zoom: 1.35; --offsetY: -70px;
+      transform: translateY(var(--offsetY)) scale(var(--zoom));
+    }
   </style>
 </head>
 <body>
@@ -66,5 +68,88 @@
       <h1><span style="color:var(--accent)">RBC ROOSENDAAL 25/26</span></h1>
       <p>Free fan-made site. Fixtures and results update automatically via live widgets. Manage the squad list yourself by editing a simple JSON file.</p>
       <div class="cta">
-        <a class="btn"
+        <a class="btn" href="#fixtures">See fixtures</a>
+        <a class="btn secondary" href="#calendar">Open calendar</a>
+      </div>
+      <p class="note">Tip: host this site on <span class="code">GitHub Pages</span> for free. See the README for step-by-step instructions.</p>
+    </div>
+    <div class="card" style="min-height:260px">
+      <h2>Latest news</h2>
+      <p class="subtle" id="news-date">Auto-refreshed each Sunday night</p>
+      <div id="news">
+        <p class="muted">Wire this card to your preferred news source later (instructions in README). For now, it shows a manual example.</p>
+        <ul id="news-list"></ul>
+      </div>
+    </div>
+  </section>
 
+  <main class="grid">
+    <article class="card" id="fixtures">
+      <h2>Fixtures &amp; Results</h2>
+      <p class="subtle">Powered by NOS Teletekst. Use tabs to switch between <strong>Results</strong> and <strong>Standings</strong>. (Zoomed/cropped to hide page header.)</p>
+
+      <div class="tabs" role="tablist" aria-label="Results and Standings">
+        <button class="tab" role="tab" aria-selected="true" aria-controls="panel-results" id="tab-results">Results</button>
+        <button class="tab" role="tab" aria-selected="false" aria-controls="panel-standings" id="tab-standings">Standings</button>
+      </div>
+
+      <div id="panel-results" class="panel active" role="tabpanel" aria-labelledby="tab-results">
+        <div class="iframe-viewport">
+          <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Results" loading="lazy"></iframe>
+        </div>
+        <p class="note">If the embed doesn’t show, <a target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-1">open Results on NOS Teletekst</a>.</p>
+      </div>
+
+      <div id="panel-standings" class="panel" role="tabpanel" aria-labelledby="tab-standings">
+        <div class="iframe-viewport">
+          <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Standings" loading="lazy"></iframe>
+        </div>
+        <p class="note">If the embed doesn’t show, <a target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-2">open Standings on NOS Teletekst</a>.</p>
+      </div>
+    </article>
+
+    <article class="card" id="squad">
+      <h2>Squad</h2>
+      <p class="subtle">Edit <span class="code">/data/players.json</span> to update this list.</p>
+      <div class="squad" id="squad-list" aria-live="polite"></div>
+    </article>
+
+    <article class="card half" id="calendar">
+      <h2>Calendar</h2>
+      <p class="subtle">Embed a public Google Calendar (club fixtures or your own). Replace the <span class="code">src</span> URL with yours — see README.</p>
+      <iframe title="RBC calendar" src="https://calendar.google.com/calendar/embed?src=c_2e7651f3f16f0e62467db879e30ae3d1b1a57e1d5e4c2d0a9f1a1b3a4c5%40group.calendar.google.com&ctz=Europe%2FAmsterdam"></iframe>
+      <p class="note">Prefer Apple/Outlook? Generate and embed an ICS/iCal feed instead.</p>
+    </article>
+
+    <article class="card half">
+      <h2>About</h2>
+      <p class="subtle">Unofficial, fan-maintained site. Not affiliated with the club. Content © their respective owners.</p>
+      <ul>
+        <li>Fixtures source: NOS Teletekst (links above)</li>
+        <li>Live widgets option: SofaScore (free)</li>
+        <li>Updates: weekly rebuild via GitHub Actions</li>
+      </ul>
+    </article>
+  </main>
+
+  <footer>
+    Built with ♥ for RBC Roosendaal • <span id="year"></span>
+  </footer>
+
+  <script src="./assets/script.js" defer></script>
+  <script>
+    // Simple tabs for Results/Standings
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.setAttribute('aria-selected', 'true');
+        const panel = document.getElementById(tab.getAttribute('aria-controls'));
+        panel.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
