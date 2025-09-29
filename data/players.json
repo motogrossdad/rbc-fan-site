@@ -6,7 +6,13 @@
     { "number": 4,  "name": "Leandro Rocha de Almeida","position": "DF", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?soccer" },
     { "number": 5,  "name": "Jordi Ewanena",           "position": "DF", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?defender" },
     { "number": 6,  "name": "Sander Wirix",            "position": "MF", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?midfielder" },
-    { "number": 7,  "name": "Rhomar Boudzra",          "position": "MF", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?football" },
+{
+  "number": 9,
+  "name": "Yassine Mejres",
+  "position": "FW",
+  "nationality": "NL",
+  "photo": "https://picsum.photos/seed/yassine/300"
+}
     { "number": 8,  "name": "Marwin Reuvers",          "position": "MF", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?soccer,player" },
     { "number": 9,  "name": "Yassine Mejres",          "position": "FW", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?striker" },
     { "number": 10, "name": "Jens Wirix",              "position": "MF", "nationality": "NL", "photo": "https://source.unsplash.com/200x200/?midfielder" },
