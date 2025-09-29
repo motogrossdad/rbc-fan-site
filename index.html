@@ -4,48 +4,49 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RBC Roosendaal 25/26</title>
-  <meta name="description" content="RBC Roosendaal 25/26: fixtures, results, squad and calendar." />
+  <meta name="description" content="Free fan-made website for RBC Roosendaal 25/26: fixtures, results, squad and calendar." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#0b1020; --card:#141a2f; --accent:#ff8c00; --muted:#94a3b8; --text:#e5e7eb; }
     * { box-sizing: border-box; }
-    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); }
-    header { position:sticky; top:0; backdrop-filter: blur(8px); background: rgba(11,16,32,.6); border-bottom:1px solid rgba(255,255,255,.06); z-index: 10;}
+    html, body { height: 100%; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height:1.5; }
+
+    /* Header / Nav */
+    header { position:sticky; top:0; backdrop-filter: blur(8px); background: rgba(11,16,32,.7); border-bottom:1px solid rgba(255,255,255,.06); z-index:10; }
     nav { max-width: 1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding: .75rem 1rem; }
-    nav a { color: var(--text); text-decoration:none; margin-left:1rem; font-weight:600; opacity:.9 }
-    nav a:hover { opacity:1; }
-    .brand { display:flex; gap:.6rem; align-items:center; font-weight:800; letter-spacing:.3px }
+    .brand { display:flex; gap:.6rem; align-items:center; font-weight:800; letter-spacing:.3px; font-size:1rem; }
     .brand .dot { width:10px;height:10px;background:var(--accent);border-radius:50%;display:inline-block }
-    .hero { max-width:1100px; margin: 2rem auto; padding: 1rem; display:grid; grid-template-columns: 1.4fr 1fr; gap:2rem; align-items:center; }
-    .hero h1 { font-size: clamp(1.8rem, 3.6vw, 3rem); margin:.2rem 0 .6rem }
-    .hero p { color: var(--muted); line-height:1.6 }
-    .cta { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1rem }
-    .btn { background:var(--accent); color:#1b1203; border:none; padding:.8rem 1rem; font-weight:700; border-radius:.9rem; cursor:pointer; }
+    .links a { color: var(--text); text-decoration:none; margin-left:.75rem; font-weight:600; opacity:.9; padding:.4rem .6rem; border-radius:.5rem; display:inline-block; }
+    .links a:hover { opacity:1; background: rgba(255,255,255,.06); }
+    @media (max-width: 600px) { .links a { margin-left:.4rem; padding:.35rem .5rem; } }
+
+    /* Hero */
+    .hero { max-width:1100px; margin: 1rem auto; padding: 1rem; display:grid; grid-template-columns: 1fr; gap:1rem; }
+    @media (min-width: 960px) { .hero { grid-template-columns: 1.4fr 1fr; gap:2rem; } }
+    .hero h1 { font-size: clamp(1.6rem, 6vw, 3rem); margin:.2rem 0 .6rem }
+    .hero p { color: var(--muted); }
+    .cta { display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.75rem }
+    .btn { background:var(--accent); color:#1b1203; border:none; padding:.8rem 1rem; font-weight:700; border-radius:.9rem; cursor:pointer; text-decoration:none; }
     .btn.secondary { background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--text) }
-    .grid { display:grid; grid-template-columns: repeat(12, 1fr); gap:1rem; max-width:1100px; margin: 1rem auto 3rem; padding:0 1rem }
-    .card { grid-column: span 12; background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:1.1rem; padding:1rem; }
-    @media (min-width: 960px) { .card.half { grid-column: span 6; } }
+    .card { background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:1.1rem; padding:1rem; }
+
+    /* Main grid */
+    .grid { display:grid; grid-template-columns: 1fr; gap:1rem; max-width:1100px; margin: 1rem auto 3rem; padding:0 1rem }
+    @media (min-width: 960px) { .grid { grid-template-columns: repeat(12, 1fr); } .card.span-12 { grid-column: span 12; } .card.half { grid-column: span 6; } }
     .card h2 { margin-top:.4rem; font-size:1.25rem }
     .subtle { color: var(--muted); font-size:.92rem }
-    iframe { width:100%; border:0; border-radius:.8rem; min-height: 540px; background:#0e1224 }
-    footer { text-align:center; color: var(--muted); padding:2rem 1rem; border-top:1px solid rgba(255,255,255,.06) }
-    .squad { display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .9rem; }
-    .player { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius:.9rem; padding:.8rem }
-    .player h3 { margin:.2rem 0 .3rem; font-size:1rem }
-    .badge { display:inline-block; background: rgba(255,140,0,.12); color: var(--accent); padding:.2rem .5rem; border-radius:.6rem; font-weight:700; font-size:.78rem }
-    .muted { color: var(--muted) }
-    .note { font-size:.9rem; color: var(--muted); margin-top:.5rem }
-    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; }
 
-    /* Teletext stacked: one below the other on all screens */
+    /* Teletekst (stacked, mobile-friendly) */
     .stack-teletext { display: grid; gap: 1rem; }
+    .tt-block h3 { margin: .2rem 0 .6rem; font-size:1.05rem; color: var(--muted); }
 
-    /* Zoom/crop wrappers for NOS pages (hide header numbers) */
+    /* Viewport wrapper: crops header on desktop, shows full page on mobile */
     .iframe-viewport {
       width: 100%;
-      height: 560px;
+      height: 560px;               /* desktop/tablet default */
       overflow: hidden;
       border-radius: .8rem;
       background: #0e1224;
@@ -54,13 +55,35 @@
     }
     .iframe-viewport iframe {
       width: 100%;
-      height: 1000px;
+      height: 1000px;              /* taller than viewport so we can crop */
       border: 0;
       transform-origin: top center;
-      --zoom: 1.22;
+      --zoom: 1.22;                /* desktop zoom/crop to hide header numbers */
       --offsetY: -58px;
       transform: translateY(var(--offsetY)) scale(var(--zoom));
     }
+
+    /* On small screens: show the FULL page (no crop/zoom), make it taller */
+    @media (max-width: 640px) {
+      .iframe-viewport { height: 82vh; }       /* almost full-height on phones */
+      .iframe-viewport iframe {
+        height: 100%;
+        transform: none !important;            /* no crop/zoom on phones */
+      }
+    }
+
+    /* Squad */
+    .squad { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .9rem; }
+    @media (min-width: 600px) { .squad { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
+    .player { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius:.9rem; padding:.8rem }
+    .player h3 { margin:.2rem 0 .3rem; font-size:1rem; line-height:1.25; }
+    .badge { display:inline-block; background: rgba(255,140,0,.12); color: var(--accent); padding:.2rem .5rem; border-radius:.6rem; font-weight:700; font-size:.78rem }
+    .muted { color: var(--muted) }
+    .note { font-size:.9rem; color: var(--muted); margin-top:.5rem }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; }
+
+    /* Footer */
+    footer { text-align:center; color: var(--muted); padding:2rem 1rem; border-top:1px solid rgba(255,255,255,.06) }
   </style>
 </head>
 <body>
@@ -76,15 +99,16 @@
   </header>
 
   <section class="hero">
-    <div>
+    <div class="card">
       <h1><span style="color:var(--accent)">RBC ROOSENDAAL 25/26</span></h1>
       <p>Free fan-made site. Fixtures and results update automatically via live widgets. Manage the squad list yourself by editing a simple JSON file.</p>
       <div class="cta">
         <a class="btn" href="#fixtures">See fixtures</a>
         <a class="btn secondary" href="#calendar">Open calendar</a>
       </div>
-      <p class="note">Tip: host this site on <span class="code">GitHub Pages</span> for free. See the README for step-by-step instructions.</p>
+      <p class="note">Tip: host this site on <span class="code">GitHub Pages</span> for free.</p>
     </div>
+
     <div class="card" style="min-height:260px">
       <h2>Latest news</h2>
       <p class="subtle" id="news-date">Auto-refreshed each Sunday night</p>
@@ -96,34 +120,32 @@
   </section>
 
   <main class="grid">
-    <article class="card" id="fixtures">
+    <article class="card span-12" id="fixtures">
       <h2>Standings &amp; Results</h2>
-      <p class="subtle">Standings first, then Results — both from NOS Teletekst.</p>
+      <p class="subtle">On phones these show full-screen height and are scrollable.</p>
 
       <div class="stack-teletext">
-        <!-- STANDINGS (first) -->
-        <section aria-label="Standings">
-          <h3 style="margin-top:0">Standings</h3>
+        <!-- STANDINGS -->
+        <section class="tt-block" aria-label="Standings">
+          <h3>Standings</h3>
           <div class="iframe-viewport">
             <iframe
               src="https://teletekst-data.nos.nl/webplus?p=835-2"
               title="NOS Teletekst — Standings"
-              loading="lazy"
-              style="--zoom:1.22; --offsetY:-58px;">
+              loading="lazy">
             </iframe>
           </div>
           <p class="note">If it doesn’t show, <a target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-2">open standings on NOS</a>.</p>
         </section>
 
-        <!-- RESULTS (second) -->
-        <section aria-label="Results">
-          <h3 style="margin-top:0">Results</h3>
+        <!-- RESULTS -->
+        <section class="tt-block" aria-label="Results">
+          <h3>Results</h3>
           <div class="iframe-viewport">
             <iframe
               src="https://teletekst-data.nos.nl/webplus?p=835-1"
               title="NOS Teletekst — Results"
-              loading="lazy"
-              style="--zoom:1.22; --offsetY:-58px;">
+              loading="lazy">
             </iframe>
           </div>
           <p class="note">If it doesn’t show, <a target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-1">open results on NOS</a>.</p>
@@ -131,7 +153,7 @@
       </div>
     </article>
 
-    <article class="card" id="squad">
+    <article class="card span-12" id="squad">
       <h2>Squad</h2>
       <p class="subtle">Edit <span class="code">/data/players.json</span> to update this list.</p>
       <div class="squad" id="squad-list" aria-live="polite"></div>
