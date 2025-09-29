@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RBC Roosendaal 25/26</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="brand"><span class="dot"></span> RBC Roosendaal</div>
+      <div class="links">
+        <a href="#tables">Tables</a>
+        <a href="#fixtures-ics">Fixtures</a>
+        <a href="#squad">Squad</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>RBC ROOSENDAAL 25/26</h1>
+  </section>
+
+  <main class="grid">
+    <section class="card span-12" id="tables">
+      <h2>Tables</h2>
+      <div>
+        <div class="tt-title">Standings</div>
+        <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-2"></iframe></div>
+      </div>
+      <div>
+        <div class="tt-title">Results</div>
+        <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-1"></iframe></div>
+      </div>
+    </section>
+
+    <section class="card span-12" id="fixtures-ics">
+      <h2>Fixtures</h2>
+      <ul id="fixtures-list"></ul>
+      <p id="fixtures-empty">No fixtures to show.</p>
+    </section>
+
+    <section class="card span-12" id="squad">
+      <h2>Squad</h2>
+      <div id="squad-list"></div>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> RBC Roosendaal</footer>
+
+  <script src="./assets/script.js"></script>
+</body>
+</html>
