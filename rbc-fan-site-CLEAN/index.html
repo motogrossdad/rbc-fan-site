@@ -72,64 +72,66 @@
   <script src="./assets/script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ical.js@1.4.0/build/ical.min.js"></script>
   <script>
-  (async function initFixtures() {
-    const list = document.getElementById('fixtures-list');
-    const empty = document.getElementById('fixtures-empty');
-    if (!list) return;
+(async function initFixtures() {
+  const list = document.getElementById('fixtures-list');
+  const empty = document.getElementById('fixtures-empty');
+  if (!list) return;
 
-    // Local path + raw GitHub fallback (always works)
-    const localUrl = new URL('./data/rbc.ics', location.href).href + '?v=' + Date.now();
-    const rawUrl   = 'https://raw.githubusercontent.com/motogrossdad/rbc-fan-site/main/data/rbc.ics?v=' + Date.now();
+  // Always fetch directly from raw GitHub
+  const ICS_URL = "https://raw.githubusercontent.com/motogrossdad/rbc-fan-site/main/data/rbc.ics" + "?v=" + Date.now();
 
-    async function fetchText(url) {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
-    }
+  const TZ = 'Europe/Amsterdam';
+  const fmt = (d) => new Intl.DateTimeFormat('nl-NL', {
+    weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: TZ
+  }).format(d);
 
-    let icsText = '';
-    try { icsText = await fetchText(localUrl); }
-    catch { icsText = await fetchText(rawUrl); }
+  function toJsDate(t) {
+    if (!t) return null;
+    if (t.isDate) return new Date(Date.UTC(t.year, t.month - 1, t.day, 0, 0, 0));
+    return t.toJSDate();
+  }
 
-    // Normalize
+  try {
+    const res = await fetch(ICS_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error('ICS HTTP ' + res.status);
+    let icsText = await res.text();
     icsText = icsText.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
 
-    const TZ = 'Europe/Amsterdam';
-    const fmt = (d)=> new Intl.DateTimeFormat('nl-NL', { weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', timeZone: TZ }).format(d);
+    const jcal = ICAL.parse(icsText);
+    const comp = new ICAL.Component(jcal);
+    const items = comp.getAllSubcomponents('vevent').map(v => new ICAL.Event(v));
 
-    function toJsDate(t){
-      if (!t) return null;
-      if (t.isDate) return new Date(Date.UTC(t.year, t.month-1, t.day, 0, 0, 0));
-      return t.toJSDate();
-    }
+    const fixtures = items.map(e => ({
+      start: toJsDate(e.startDate),
+      end: e.endDate ? toJsDate(e.endDate) : null,
+      summary: e.summary || 'Fixture',
+      location: e.location || ''
+    })).filter(f => f.start && !Number.isNaN(+f.start));
 
-    try {
-      const jcal = ICAL.parse(icsText);
-      const comp = new ICAL.Component(jcal);
-      const items = comp.getAllSubcomponents('vevent').map(v => new ICAL.Event(v));
-      const fixtures = items.map(e => ({
-        start: toJsDate(e.startDate),
-        end: e.endDate ? toJsDate(e.endDate) : null,
-        summary: e.summary || 'Fixture',
-        location: e.location || ''
-      })).filter(f => f.start && !Number.isNaN(+f.start));
+    fixtures.sort((a, b) => a.start - b.start);
 
-      fixtures.sort((a,b)=> a.start - b.start);
-      if (!fixtures.length) { empty.style.display='block'; return; }
-
-      const frag = document.createDocumentFragment();
-      fixtures.forEach(f => {
-        const li = document.createElement('li');
-        li.textContent = `${fmt(f.start)} — ${f.summary}${f.location ? ' · ' + f.location : ''}`;
-        frag.appendChild(li);
-      });
-      list.appendChild(frag);
-    } catch (e) {
-      console.error('[RBC] ICS parse error', e);
-      empty.textContent = 'Kon fixtures niet laden (controleer data/rbc.ics).';
+    if (!fixtures.length) {
       empty.style.display = 'block';
+      return;
     }
-  })();
-  </script>
+
+    list.innerHTML = '';
+    empty.style.display = 'none';
+
+    const frag = document.createDocumentFragment();
+    fixtures.forEach(f => {
+      const li = document.createElement('li');
+      li.textContent = `${fmt(f.start)} — ${f.summary}${f.location ? ' · ' + f.location : ''}`;
+      frag.appendChild(li);
+    });
+    list.appendChild(frag);
+  } catch (e) {
+    console.error('[RBC] ICS parse error', e);
+    empty.textContent = 'Kon fixtures niet laden (controleer data/rbc.ics).';
+    empty.style.display = 'block';
+  }
+})();
+</script>
+
 </body>
 </html>
