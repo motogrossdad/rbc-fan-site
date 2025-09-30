@@ -4,167 +4,148 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RBC Roosendaal 25/26</title>
-  <meta name="description" content="RBC Roosendaal 25/26: Standings, Results, Squad and Calendar." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#0b1020; --card:#141a2f; --accent:#ff8c00; --muted:#94a3b8; --text:#e5e7eb; }
-
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg); color: var(--text); line-height:1.5;
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); }
+    header { position:sticky; top:0; background:rgba(11,16,32,.8); border-bottom:1px solid rgba(255,255,255,.06); z-index:10; }
+    nav { max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; padding:.75rem 1rem; }
+    .brand { font-weight:800; }
+    .links a { color:var(--text); margin-left:1rem; text-decoration:none; font-weight:600; }
+
+    .grid { display:grid; grid-template-columns:1fr; gap:1rem; max-width:1100px; margin:1rem auto; padding:0 1rem; }
+    .card { background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:.8rem; padding:1rem; }
+    h2 { margin:0 0 .6rem; }
+
+    /* Teletext — balanced sizes (not tiny, not huge) */
+    .tt { margin-bottom:1rem; }
+    .tt .frame {
+      width:100%;
+      height: 60vh;            /* desktop default */
+      border:0;
+      border-radius:.8rem;
+      background:#0e1224;
     }
+    @media (max-width: 1024px) { .tt .frame { height: 55vh; } }  /* tablet */
+    @media (max-width: 600px)  { .tt .frame { height: 65vh; } }  /* mobile */
 
-    header { position:sticky; top:0; backdrop-filter: blur(8px); background: rgba(11,16,32,.7); border-bottom:1px solid rgba(255,255,255,.06); z-index:10; }
-    nav { max-width: 1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding: .75rem 1rem; }
-    .brand { display:flex; gap:.6rem; align-items:center; font-weight:800; letter-spacing:.3px; font-size:1rem; }
-    .brand .dot { width:10px;height:10px;background:var(--accent);border-radius:50%;display:inline-block }
-    .links a { color: var(--text); text-decoration:none; margin-left:.75rem; font-weight:600; opacity:.9; padding:.4rem .6rem; border-radius:.5rem; display:inline-block; }
-    .links a:hover { opacity:1; background: rgba(255,255,255,.06); }
-
-    .hero { max-width:1100px; margin: 1rem auto; padding: 1rem; }
-    .hero h1 { font-size: clamp(1.6rem, 6vw, 3rem); margin:.2rem 0 .2rem }
-
-    .grid { display:grid; grid-template-columns: 1fr; gap:1rem; max-width:1100px; margin: 1rem auto 3rem; padding:0 1rem }
-    @media (min-width: 960px) { .grid { grid-template-columns: repeat(12, 1fr); } .card.span-12 { grid-column: span 12; } .card.half { grid-column: span 6; } }
-
-    .card { background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:1.1rem; padding:1rem; }
-    .card h2 { margin:.2rem 0 .8rem; font-size:1.25rem }
-    .subtle { color: var(--muted); font-size:.92rem }
-
-    /* Teletext thumbnails */
-    .tt-grid { display:grid; gap: 1rem; }
-    .tt-title { margin:.2rem 0 .6rem; font-size:1.05rem; color: var(--muted); }
-
-    /* Viewport wrapper. Desktop: crop/zoom to hide header. Mobile: tiny thumbnails via scale. */
-    .iframe-viewport {
-      width: 100%;
-      height: 560px; /* desktop/tablet */
-      overflow: hidden;
-      border-radius: .8rem;
-      background: #0e1224;
-      border: 0;
-      position: relative;
-    }
-    .iframe-viewport iframe {
-      width: 100%;
-      height: 1000px;
-      border: 0;
-      transform-origin: top center;
-      --zoom: 1.22;
-      --offsetY: -58px;
-      transform: translateY(var(--offsetY)) scale(var(--zoom));
-    }
-
-    /* Mobile: super small thumbnails */
-    @media (max-width: 640px) {
-      .iframe-viewport {
-        height: 220px;            /* small, card-like */
-      }
-      .iframe-viewport iframe {
-        height: 900px;
-        /* show entire page but scaled down to a tiny preview */
-        --zoom: 0.48;             /* smaller = smaller thumbnail */
-        --offsetY: 0px;
-        transform: translateY(var(--offsetY)) scale(var(--zoom));
-      }
-    }
-
-    .tt-actions {
-      display:flex; gap:.5rem; margin-top:.6rem;
-    }
-    .btn {
-      background:var(--accent); color:#1b1203; border:none; padding:.6rem .8rem; font-weight:700;
-      border-radius:.7rem; cursor:pointer; text-decoration:none; display:inline-block;
-    }
-    .btn.secondary { background:transparent; border:1px solid rgba(255,255,255,.15); color:var(--text) }
+    /* Fixtures list */
+    .fixtures { list-style:none; padding:0; margin:0; display:grid; gap:.5rem; }
+    .fixtures li { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:.6rem; padding:.6rem .8rem; }
 
     /* Squad */
-    .squad { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .9rem; }
-    @media (min-width: 600px) { .squad { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
-    .player { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius:.9rem; padding:.8rem }
-    .player h3 { margin:.2rem 0 .3rem; font-size:1rem; line-height:1.25; }
-    .badge { display:inline-block; background: rgba(255,140,0,.12); color: var(--accent); padding:.2rem .5rem; border-radius:.6rem; font-weight:700; font-size:.78rem }
-    .muted { color: var(--muted) }
+    .squad { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.8rem; }
+    .player { background:rgba(255,255,255,.05); border-radius:.6rem; padding:.6rem; text-align:center; }
+    .player h3 { margin:.2rem 0 .25rem; font-size:1rem; }
+    .muted { color:var(--muted); }
 
-    /* Calendar */
-    iframe.calendar { width:100%; border:0; border-radius:.8rem; min-height: 540px; background:#0e1224 }
-
-    footer { text-align:center; color: var(--muted); padding:2rem 1rem; border-top:1px solid rgba(255,255,255,.06) }
+    footer { text-align:center; color:var(--muted); padding:1rem; }
   </style>
 </head>
 <body>
   <header>
     <nav>
-      <div class="brand"><span class="dot"></span> RBC Roosendaal</div>
+      <div class="brand">RBC Roosendaal</div>
       <div class="links">
         <a href="#tables">Tables</a>
+        <a href="#fixtures">Fixtures</a>
         <a href="#squad">Squad</a>
-        <a href="#calendar">Calendar</a>
       </div>
     </nav>
   </header>
 
-  <section class="hero">
-    <h1>RBC ROOSENDAAL 25/26</h1>
-  </section>
-
   <main class="grid">
-    <!-- Tables -->
-    <section class="card span-12" id="tables">
+    <!-- Teletext -->
+    <section class="card" id="tables">
       <h2>Tables</h2>
-      <div class="tt-grid">
-        <div>
-          <div class="tt-title">Standings</div>
-          <div class="iframe-viewport">
-            <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Standings" loading="lazy"></iframe>
-          </div>
-          <div class="tt-actions">
-            <a class="btn" target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-2">Open full page</a>
-          </div>
-        </div>
-
-        <div>
-          <div class="tt-title">Results</div>
-          <div class="iframe-viewport">
-            <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Results" loading="lazy"></iframe>
-          </div>
-          <div class="tt-actions">
-            <a class="btn" target="_blank" href="https://teletekst-data.nos.nl/webplus?p=835-1">Open full page</a>
-          </div>
-        </div>
+      <div class="tt">
+        <h3 style="margin:.2rem 0 .5rem; color:var(--muted);">Standings</h3>
+        <iframe class="frame" src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Standings" loading="lazy"></iframe>
+      </div>
+      <div class="tt">
+        <h3 style="margin:.2rem 0 .5rem; color:var(--muted);">Results</h3>
+        <iframe class="frame" src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Results" loading="lazy"></iframe>
       </div>
     </section>
 
+    <!-- Fixtures -->
+    <section class="card" id="fixtures">
+      <h2>Fixtures</h2>
+      <ul id="fixtures-list" class="fixtures"></ul>
+      <p id="fixtures-empty" class="muted" style="display:none">Geen wedstrijden gevonden.</p>
+    </section>
+
     <!-- Squad -->
-    <section class="card span-12" id="squad">
+    <section class="card" id="squad">
       <h2>Squad</h2>
-      <div class="squad" id="squad-list" aria-live="polite"></div>
-    </section>
-
-    <!-- Calendar -->
-    <section class="card half" id="calendar">
-      <h2>Calendar</h2>
-      <iframe
-        class="calendar"
-        title="RBC calendar"
-        src="https://calendar.google.com/calendar/embed?src=c_2e7651f3f16f0e62467db879e30ae3d1b1a57e1d5e4c2d0a9f1a1b3a4c5%40group.calendar.google.com&ctz=Europe%2FAmsterdam">
-      </iframe>
-    </section>
-
-    <section class="card half">
-      <h2>About</h2>
-      <p class="subtle">Unofficial fan site for RBC Roosendaal.</p>
+      <div class="squad" id="squad-list"></div>
     </section>
   </main>
 
-  <footer>
-    © <span id="year"></span> RBC Roosendaal
-  </footer>
+  <footer>© <span id="year"></span> RBC Roosendaal</footer>
 
-  <script src="./assets/script.js" defer></script>
+  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+  <script src="./assets/script.js"></script>
+
+  <!-- ICS parser -->
+  <script src="https://cdn.jsdelivr.net/npm/ical.js@1.4.0/build/ical.min.js"></script>
+
+  <!-- Robust fixtures loader: ALWAYS pulls from your raw GitHub ICS -->
+  <script>
+  (async function initFixtures() {
+    const list = document.getElementById('fixtures-list');
+    const empty = document.getElementById('fixtures-empty');
+    if (!list) return;
+
+    const ICS_URL = "https://raw.githubusercontent.com/motogrossdad/rbc-fan-site/main/data/rbc.ics" + "?v=" + Date.now();
+
+    const TZ = 'Europe/Amsterdam';
+    const fmt = (d) => new Intl.DateTimeFormat('nl-NL', {
+      weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', timeZone: TZ
+    }).format(d);
+
+    function toJsDate(t) {
+      if (!t) return null;
+      if (t.isDate) return new Date(Date.UTC(t.year, t.month - 1, t.day, 0, 0, 0));
+      return t.toJSDate();
+    }
+
+    try {
+      const res = await fetch(ICS_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('ICS HTTP ' + res.status);
+      let icsText = await res.text();
+      icsText = icsText.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+
+      const jcal = ICAL.parse(icsText);
+      const comp = new ICAL.Component(jcal);
+      const items = comp.getAllSubcomponents('vevent').map(v => new ICAL.Event(v));
+
+      const fixtures = items.map(e => ({
+        start: toJsDate(e.startDate),
+        end: e.endDate ? toJsDate(e.endDate) : null,
+        summary: e.summary || 'Fixture',
+        location: e.location || ''
+      })).filter(f => f.start && !Number.isNaN(+f.start))
+        .sort((a,b)=> a.start - b.start);
+
+      list.innerHTML = '';
+      if (!fixtures.length) { empty.style.display = 'block'; return; }
+      empty.style.display = 'none';
+
+      const frag = document.createDocumentFragment();
+      fixtures.forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = `${fmt(f.start)} — ${f.summary}${f.location ? ' · ' + f.location : ''}`;
+        frag.appendChild(li);
+      });
+      list.appendChild(frag);
+    } catch (e) {
+      console.error('[RBC] ICS parse error', e);
+      empty.textContent = 'Kon fixtures niet laden (controleer data/rbc.ics).';
+      empty.style.display = 'block';
+    }
+  })();
+  </script>
 </body>
 </html>
