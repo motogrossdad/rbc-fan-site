@@ -41,12 +41,6 @@
       h3.textContent = p.name || 'Speler';
       card.appendChild(h3);
 
-      // Position
-      const role = document.createElement('div');
-      role.className = 'muted';
-      role.textContent = p.position || '';
-      card.appendChild(role);
-
       frag.appendChild(card);
     });
 
