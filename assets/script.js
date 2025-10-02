@@ -5,30 +5,20 @@
   try {
     const res = await fetch('./data/players.json?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const players = await res.json();
-    if (!Array.isArray(players) || players.length === 0) {
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : (Array.isArray(data.players) ? data.players : []);
+    if (!list.length) {
       empty.style.display='block';
       return;
     }
 
     const frag = document.createDocumentFragment();
 
-    players.forEach(p => {
+    list.forEach(p => {
       const card = document.createElement('div');
       card.className = 'player';
 
-      // Player photo
-      if (p.photo) {
-        const img = document.createElement('img');
-        img.src = p.photo;
-        img.alt = p.name || 'Speler';
-        img.style.width = '100%';
-        img.style.borderRadius = '0.6rem';
-        img.style.marginBottom = '0.5rem';
-        card.appendChild(img);
-      }
-
-      // Number badge
+      // Number badge (always on top)
       if (p.number) {
         const badge = document.createElement('div');
         badge.className = 'badge';
@@ -36,7 +26,18 @@
         card.appendChild(badge);
       }
 
-      // Name
+      // Player photo
+      if (p.photo) {
+        const img = document.createElement('img');
+        img.alt = (p.name || 'Speler') + ' foto';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.src = p.photo;
+        img.onerror = () => { img.style.display='none'; };
+        card.appendChild(img);
+      }
+
+      // Player name
       const h3 = document.createElement('h3');
       h3.textContent = p.name || 'Speler';
       card.appendChild(h3);
