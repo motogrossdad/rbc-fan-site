@@ -1,5 +1,4 @@
-{
-  "players": [
+[
     {
       "number": 3,
       "name": "Perry Bierkens",
@@ -111,5 +110,4 @@
       "position": "DF",
       "nationality": "NL",
       "photo": "https://rbc.svsplus.nl/php/image.php?image=bas-rockx-20-.jpg&category=members"
-    },
-    {
+  ]
