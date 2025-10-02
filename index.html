@@ -7,41 +7,40 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg:#0b1020; --card:#141a2f; --accent:#ff8c00; --muted:#94a3b8; --text:#e5e7eb; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); line-height:1.4; }
-    header { position:sticky; top:0; backdrop-filter:saturate(180%) blur(8px); background:rgba(11,16,32,.82); border-bottom:1px solid rgba(255,255,255,.06); z-index:10; }
-    nav { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:.75rem 1rem; }
-    .brand { font-weight:800; letter-spacing:.2px; }
-    .links a { color:var(--text); margin-left:1rem; text-decoration:none; font-weight:600; opacity:.9 }
-    .links a:hover{ opacity:1 }
+    body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); }
+    header { position:sticky; top:0; background:rgba(11,16,32,.85); border-bottom:1px solid rgba(255,255,255,.06); z-index:10; }
+    nav { max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; padding:.75rem 1rem; }
+    .brand { font-weight:800; font-size:1.1rem; }
+    .links a { color:var(--text); margin-left:1rem; text-decoration:none; font-weight:600; }
+    .grid { display:grid; grid-template-columns:1fr; gap:1rem; max-width:1100px; margin:1rem auto; padding:0 1rem; }
+    .card { background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:.8rem; padding:1rem; }
+    h2 { margin:0 0 .6rem; }
+    h3 { margin:.8rem 0 .4rem; }
 
-    .grid { display:grid; grid-template-columns:1fr; gap:1rem; max-width:1100px; margin:1rem auto; padding:0 1rem 2rem; }
-    .card { background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:.9rem; padding:1rem; }
-    h2 { margin:0 0 .7rem; }
-    h3 { margin:1rem 0 .5rem; font-size:1rem; opacity:.95 }
-
-    /* Teletext viewport: tidy sizing and full width, but not overwhelming */
-    .iframe-viewport { width:100%; height:60vh; border-radius:.8rem; background:#0e1224; border:0; overflow:hidden; }
+    /* Teletext iframes */
+    .iframe-viewport { width:100%; height:80vh; border-radius:.8rem; background:#0e1224; border:0; overflow:hidden; margin-bottom:1rem; }
     .iframe-viewport iframe { width:100%; height:100%; border:0; }
-    @media(max-width:720px){ .iframe-viewport{ height:58vh; } }
-    @media(max-width:480px){ .iframe-viewport{ height:52vh; } }
 
-    /* Fixtures */
-    .fixtures { list-style:none; padding:0; margin:0; display:grid; gap:.5rem; }
-    .fixtures li { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:.6rem; padding:.6rem .8rem; }
-    .fixture-title { font-weight:600 }
-    .muted { color:var(--muted); }
+    /* Fixtures table */
+    table.fixtures { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.9rem; }
+    table.fixtures th, table.fixtures td { border:1px solid rgba(255,255,255,0.15); padding:0.4rem 0.6rem; text-align:center; }
+    table.fixtures th { background:rgba(255,255,255,0.08); font-weight:600; }
 
-    /* Squad */
+    /* Squad grid */
     .squad { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.8rem; }
     .player { background:rgba(255,255,255,.05); border-radius:.6rem; padding:.6rem; text-align:center; }
-    .player h3 { margin:.2rem 0 .25rem; font-size:1rem; }
+    .player img { width:100%; border-radius:.6rem; margin-bottom:.5rem; }
+    .player h3 { margin:.3rem 0; font-size:1rem; }
+    .badge { display:inline-block; background:rgba(255,140,0,.12); color:var(--accent); padding:.2rem .5rem; border-radius:.6rem; font-weight:700; font-size:.78rem; margin-bottom:.3rem; }
+    .muted { color:var(--muted); }
+
+    footer { text-align:center; color:var(--muted); padding:1rem; font-size:0.9rem; border-top:1px solid rgba(255,255,255,.06); margin-top:2rem; }
   </style>
 </head>
 <body>
   <header>
     <nav>
-      <div class="brand">RBC Roosendaal</div>
+      <div class="brand">RBC Roosendaal 25/26</div>
       <div class="links">
         <a href="#tables">Stand</a>
         <a href="#fixtures">Programma</a>
@@ -51,108 +50,29 @@
   </header>
 
   <main class="grid">
+    <!-- Standings and Results -->
     <section class="card" id="tables">
-      <h2>Tables</h2>
+      <h2>Stand & Uitslagen</h2>
       <h3>Stand</h3>
-      <div class="iframe-viewport">
-        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand" loading="lazy" referrerpolicy="no-referrer"></iframe>
-      </div>
+      <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand"></iframe></div>
       <h3>Uitslagen</h3>
-      <div class="iframe-viewport">
-        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen" loading="lazy" referrerpolicy="no-referrer"></iframe>
-      </div>
+      <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe></div>
     </section>
 
+    <!-- Fixtures -->
     <section class="card" id="fixtures">
-      <h2>Programma</h2>
-      <ul id="fixtures-list" class="fixtures"></ul>
-      <p id="fixtures-empty" class="muted" style="display:none">Geen wedstrijden gevonden.</p>
-    </section>
+      <h2>Programma & Resultaten</h2>
 
-    <section class="card" id="squad">
-      <h2>Selectie</h2>
-      <div class="squad" id="squad-list"></div>
-      <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
-    </section>
-  </main>
+      <h3>KNVB Beker 2025/2026</h3>
+      <table class="fixtures">
+        <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
+        <tr><td>1. pre-round</td><td>03/09/2025</td><td>19:00</td><td>A</td><td>ADO '20</td><td>2:0 (0:0)</td></tr>
+        <tr><td>2. pre-round</td><td>23/09/2025</td><td>19:00</td><td>H</td><td>GVVV</td><td>0:1 (0:0)</td></tr>
+      </table>
 
-  <footer style="text-align:center; color:var(--muted); padding:1rem;">© <span id="year"></span> RBC Roosendaal</footer>
-
-  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
-  <script src="https://cdn.jsdelivr.net/npm/ical.js@1.4.0/build/ical.min.js"></script>
-  <script src="./assets/script.js"></script>
-  <script>
-  // ---- Fixtures (ICS) ----
-  (async function initFixtures() {
-    const list = document.getElementById('fixtures-list');
-    const empty = document.getElementById('fixtures-empty');
-    const TZ = 'Europe/Amsterdam';
-
-    function fmt(d){
-      return new Intl.DateTimeFormat('nl-NL', {
-        weekday:'short', day:'2-digit', month:'short',
-        hour:'2-digit', minute:'2-digit', timeZone: TZ
-      }).format(d);
-    }
-
-    function toJsDate(t){
-      if (!t) return null;
-      if (t.isDate) return new Date(Date.UTC(t.year, t.month-1, t.day, 0, 0, 0));
-      return t.toJSDate();
-    }
-
-    async function fetchText(url) {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.text();
-    }
-
-    const localUrl = new URL('./data/rbc.ics', location.href).href + '?v=' + Date.now();
-
-    let icsText = '';
-    try { icsText = await fetchText(localUrl); }
-    catch (e) {
-      console.warn('[RBC] Calendar load failed:', e);
-      empty.style.display='block';
-      empty.textContent = 'Kon kalender niet laden.';
-      return;
-    }
-
-    icsText = icsText.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
-    try {
-      const jcal = ICAL.parse(icsText);
-      const comp = new ICAL.Component(jcal);
-      const items = comp.getAllSubcomponents('vevent').map(v => new ICAL.Event(v));
-      const fixtures = items.map(e => ({
-        start: toJsDate(e.startDate),
-        end: e.endDate ? toJsDate(e.endDate) : null,
-        summary: e.summary || 'Wedstrijd',
-        location: e.location || ''
-      })).filter(f => f.start && !Number.isNaN(+f.start));
-
-      fixtures.sort((a,b)=> a.start - b.start);
-      if (!fixtures.length) { empty.style.display='block'; return; }
-
-      const frag = document.createDocumentFragment();
-      fixtures.forEach(f => {
-        const li = document.createElement('li');
-        const title = document.createElement('div');
-        title.className='fixture-title';
-        title.textContent = f.summary;
-        const meta = document.createElement('div');
-        meta.className='muted';
-        meta.textContent = `${fmt(f.start)}${f.location ? ' · ' + f.location : ''}`;
-        li.appendChild(title);
-        li.appendChild(meta);
-        frag.appendChild(li);
-      });
-      list.appendChild(frag);
-    } catch (e) {
-      console.error('[RBC] ICS parse error', e);
-      empty.textContent = 'Kon fixtures niet verwerken (controleer data/rbc.ics).';
-      empty.style.display = 'block';
-    }
-  })();
-  </script>
-</body>
-</html>
+      <h3>Derde Divisie B 2025/2026</h3>
+      <table class="fixtures">
+        <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
+        <tr><td>1</td><td>17/08/2025</td><td>13:00</td><td>H</td><td>SV Meerssen</td><td>3:1 (2:0)</td></tr>
+        <tr><td>2</td><td>23/08/2025</td><td>17:00</td><td>A</td><td>VV Sint Bavo</td><td>1:2 (1:1)</td></tr>
+        <tr><td>3</td><td>31/08/2025</td><td>13:00</td><td>H</td><td>VV GOES</td><td>3:0 (3:
