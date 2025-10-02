@@ -18,7 +18,7 @@
       const card = document.createElement('div');
       card.className = 'player';
 
-      // Number badge (always on top)
+      // Badge overlay
       if (p.number) {
         const badge = document.createElement('div');
         badge.className = 'badge';
@@ -26,7 +26,7 @@
         card.appendChild(badge);
       }
 
-      // Player photo
+      // Photo
       if (p.photo) {
         const img = document.createElement('img');
         img.alt = (p.name || 'Speler') + ' foto';
@@ -37,7 +37,7 @@
         card.appendChild(img);
       }
 
-      // Player name
+      // Name
       const h3 = document.createElement('h3');
       h3.textContent = p.name || 'Speler';
       card.appendChild(h3);
