@@ -9,7 +9,7 @@
     :root{
       --bg:#0b1020;
       --card:#141a2f;
-      --accent:#f1942d; /* club vibe colour */
+      --accent:#f1942d;
       --muted:#94a3b8;
       --text:#e5e7eb;
     }
@@ -81,7 +81,30 @@
     <!-- Fixtures -->
     <section class="card" id="fixtures">
       <h2>Programma & Resultaten</h2>
-      <!-- keep your fixtures tables here -->
+
+      <h3>KNVB Beker 2025/2026</h3>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <thead>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
+          </thead>
+          <tbody id="cup-body"></tbody>
+        </table>
+      </div>
+
+      <h3>Derde Divisie B 2025/2026</h3>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <thead>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
+          </thead>
+          <tbody id="league-body"></tbody>
+        </table>
+      </div>
     </section>
 
     <!-- Squad -->
