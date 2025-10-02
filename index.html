@@ -22,9 +22,10 @@
     .iframe-viewport iframe { width:100%; height:100%; border:0; }
 
     /* Fixtures table */
-    table.fixtures { width:100%; border-collapse:collapse; margin-bottom:1.5rem; font-size:0.9rem; }
-    table.fixtures th, table.fixtures td { border:1px solid rgba(255,255,255,0.15); padding:0.4rem 0.6rem; text-align:center; }
-    table.fixtures th { background:rgba(255,255,255,0.08); font-weight:600; }
+    .fixtures-wrapper { width:100%; overflow-x:auto; margin-bottom:1.5rem; border-radius:.6rem; }
+    table.fixtures { width:100%; border-collapse:collapse; font-size:0.9rem; min-width:600px; }
+    table.fixtures th, table.fixtures td { border:1px solid rgba(255,255,255,0.15); padding:0.5rem 0.6rem; text-align:center; }
+    table.fixtures th { background:rgba(255,255,255,0.08); font-weight:600; position:sticky; top:0; z-index:2; }
 
     /* Squad grid */
     .squad { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.8rem; }
@@ -64,50 +65,54 @@
       <h2>Programma & Resultaten</h2>
 
       <h3>KNVB Beker 2025/2026</h3>
-      <table class="fixtures">
-        <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
-        <tr><td>1. pre-round</td><td>03/09/2025</td><td>19:00</td><td>A</td><td>ADO '20</td><td>2:0 (0:0)</td></tr>
-        <tr><td>2. pre-round</td><td>23/09/2025</td><td>19:00</td><td>H</td><td>GVVV</td><td>0:1 (0:0)</td></tr>
-      </table>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
+          <tr><td>1. pre-round</td><td>03/09/2025</td><td>19:00</td><td>A</td><td>ADO '20</td><td>2:0 (0:0)</td></tr>
+          <tr><td>2. pre-round</td><td>23/09/2025</td><td>19:00</td><td>H</td><td>GVVV</td><td>0:1 (0:0)</td></tr>
+        </table>
+      </div>
 
       <h3>Derde Divisie B 2025/2026</h3>
-      <table class="fixtures">
-        <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
-        <tr><td>1</td><td>17/08/2025</td><td>13:00</td><td>H</td><td>SV Meerssen</td><td>3:1 (2:0)</td></tr>
-        <tr><td>2</td><td>23/08/2025</td><td>17:00</td><td>A</td><td>VV Sint Bavo</td><td>1:2 (1:1)</td></tr>
-        <tr><td>3</td><td>31/08/2025</td><td>13:00</td><td>H</td><td>VV GOES</td><td>3:0 (3:0)</td></tr>
-        <tr><td>4</td><td>06/09/2025</td><td>13:30</td><td>A</td><td>FC Rijnvogels</td><td>0:4 (0:2)</td></tr>
-        <tr><td>5</td><td>14/09/2025</td><td>13:00</td><td>H</td><td>VV UNA</td><td>2:3 (0:2)</td></tr>
-        <tr><td>6</td><td>20/09/2025</td><td>18:00</td><td>A</td><td>VV Gemert</td><td>2:2 (2:1)</td></tr>
-        <tr><td>7</td><td>27/09/2025</td><td>13:30</td><td>A</td><td>SVV Scheveningen</td><td>1:3 (0:1)</td></tr>
-        <tr><td>8</td><td>04/10/2025</td><td>17:00</td><td>H</td><td>VV Zwaluwen</td><td>-:-</td></tr>
-        <tr><td>9</td><td>12/10/2025</td><td>13:30</td><td>A</td><td>RKSV Groene Ster</td><td>-:-</td></tr>
-        <tr><td>10</td><td>18/10/2025</td><td>17:00</td><td>H</td><td>VV Noordwijk</td><td>-:-</td></tr>
-        <tr><td>11</td><td>25/10/2025</td><td>13:30</td><td>A</td><td>SteDoCo</td><td>-:-</td></tr>
-        <tr><td>12</td><td>08/11/2025</td><td>17:00</td><td>H</td><td>VV Kloetinge</td><td>-:-</td></tr>
-        <tr><td>13</td><td>16/11/2025</td><td>13:30</td><td>A</td><td>SV TOGB</td><td>-:-</td></tr>
-        <tr><td>14</td><td>22/11/2025</td><td>17:00</td><td>H</td><td>ASWH Ido-Ambacht</td><td>-:-</td></tr>
-        <tr><td>15</td><td>30/11/2025</td><td>13:00</td><td>A</td><td>Blauw Geel '38</td><td>-:-</td></tr>
-        <tr><td>16</td><td>07/12/2025</td><td>13:00</td><td>H</td><td>FC Lisse</td><td>-:-</td></tr>
-        <tr><td>17</td><td>14/12/2025</td><td>13:00</td><td>A</td><td>UDI'19/Beter Bed</td><td>-:-</td></tr>
-        <tr><td>18</td><td>11/01/2026</td><td>13:30</td><td>A</td><td>SV Meerssen</td><td>-:-</td></tr>
-        <tr><td>19</td><td>18/01/2026</td><td>13:00</td><td>H</td><td>VV Sint Bavo</td><td>-:-</td></tr>
-        <tr><td>20</td><td>25/01/2026</td><td>13:30</td><td>A</td><td>VV GOES</td><td>-:-</td></tr>
-        <tr><td>21</td><td>01/02/2026</td><td>13:00</td><td>H</td><td>FC Rijnvogels</td><td>-:-</td></tr>
-        <tr><td>22</td><td>08/02/2026</td><td>13:30</td><td>A</td><td>VV UNA</td><td>-:-</td></tr>
-        <tr><td>23</td><td>22/02/2026</td><td>13:00</td><td>H</td><td>VV Gemert</td><td>-:-</td></tr>
-        <tr><td>24</td><td>28/02/2026</td><td>17:00</td><td>H</td><td>SVV Scheveningen</td><td>-:-</td></tr>
-        <tr><td>25</td><td>07/03/2026</td><td>13:30</td><td>A</td><td>VV Zwaluwen</td><td>-:-</td></tr>
-        <tr><td>26</td><td>15/03/2026</td><td>13:00</td><td>H</td><td>RKSV Groene Ster</td><td>-:-</td></tr>
-        <tr><td>27</td><td>21/03/2026</td><td>13:30</td><td>A</td><td>VV Noordwijk</td><td>-:-</td></tr>
-        <tr><td>28</td><td>28/03/2026</td><td>17:00</td><td>H</td><td>SteDoCo</td><td>-:-</td></tr>
-        <tr><td>29</td><td>11/04/2026</td><td>14:00</td><td>A</td><td>VV Kloetinge</td><td>-:-</td></tr>
-        <tr><td>30</td><td>19/04/2026</td><td>13:00</td><td>H</td><td>SV TOGB</td><td>-:-</td></tr>
-        <tr><td>31</td><td>25/04/2026</td><td>14:00</td><td>A</td><td>ASWH Ido-Ambacht</td><td>-:-</td></tr>
-        <tr><td>32</td><td>10/05/2026</td><td>13:00</td><td>H</td><td>Blauw Geel '38</td><td>-:-</td></tr>
-        <tr><td>33</td><td>16/05/2026</td><td>–</td><td>A</td><td>FC Lisse</td><td>-:-</td></tr>
-        <tr><td>34</td><td>23/05/2026</td><td>–</td><td>H</td><td>UDI'19/Beter Bed</td><td>-:-</td></tr>
-      </table>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
+          <tr><td>1</td><td>17/08/2025</td><td>13:00</td><td>H</td><td>SV Meerssen</td><td>3:1 (2:0)</td></tr>
+          <tr><td>2</td><td>23/08/2025</td><td>17:00</td><td>A</td><td>VV Sint Bavo</td><td>1:2 (1:1)</td></tr>
+          <tr><td>3</td><td>31/08/2025</td><td>13:00</td><td>H</td><td>VV GOES</td><td>3:0 (3:0)</td></tr>
+          <tr><td>4</td><td>06/09/2025</td><td>13:30</td><td>A</td><td>FC Rijnvogels</td><td>0:4 (0:2)</td></tr>
+          <tr><td>5</td><td>14/09/2025</td><td>13:00</td><td>H</td><td>VV UNA</td><td>2:3 (0:2)</td></tr>
+          <tr><td>6</td><td>20/09/2025</td><td>18:00</td><td>A</td><td>VV Gemert</td><td>2:2 (2:1)</td></tr>
+          <tr><td>7</td><td>27/09/2025</td><td>13:30</td><td>A</td><td>SVV Scheveningen</td><td>1:3 (0:1)</td></tr>
+          <tr><td>8</td><td>04/10/2025</td><td>17:00</td><td>H</td><td>VV Zwaluwen</td><td>-:-</td></tr>
+          <tr><td>9</td><td>12/10/2025</td><td>13:30</td><td>A</td><td>RKSV Groene Ster</td><td>-:-</td></tr>
+          <tr><td>10</td><td>18/10/2025</td><td>17:00</td><td>H</td><td>VV Noordwijk</td><td>-:-</td></tr>
+          <tr><td>11</td><td>25/10/2025</td><td>13:30</td><td>A</td><td>SteDoCo</td><td>-:-</td></tr>
+          <tr><td>12</td><td>08/11/2025</td><td>17:00</td><td>H</td><td>VV Kloetinge</td><td>-:-</td></tr>
+          <tr><td>13</td><td>16/11/2025</td><td>13:30</td><td>A</td><td>SV TOGB</td><td>-:-</td></tr>
+          <tr><td>14</td><td>22/11/2025</td><td>17:00</td><td>H</td><td>ASWH Ido-Ambacht</td><td>-:-</td></tr>
+          <tr><td>15</td><td>30/11/2025</td><td>13:00</td><td>A</td><td>Blauw Geel '38</td><td>-:-</td></tr>
+          <tr><td>16</td><td>07/12/2025</td><td>13:00</td><td>H</td><td>FC Lisse</td><td>-:-</td></tr>
+          <tr><td>17</td><td>14/12/2025</td><td>13:00</td><td>A</td><td>UDI'19/Beter Bed</td><td>-:-</td></tr>
+          <tr><td>18</td><td>11/01/2026</td><td>13:30</td><td>A</td><td>SV Meerssen</td><td>-:-</td></tr>
+          <tr><td>19</td><td>18/01/2026</td><td>13:00</td><td>H</td><td>VV Sint Bavo</td><td>-:-</td></tr>
+          <tr><td>20</td><td>25/01/2026</td><td>13:30</td><td>A</td><td>VV GOES</td><td>-:-</td></tr>
+          <tr><td>21</td><td>01/02/2026</td><td>13:00</td><td>H</td><td>FC Rijnvogels</td><td>-:-</td></tr>
+          <tr><td>22</td><td>08/02/2026</td><td>13:30</td><td>A</td><td>VV UNA</td><td>-:-</td></tr>
+          <tr><td>23</td><td>22/02/2026</td><td>13:00</td><td>H</td><td>VV Gemert</td><td>-:-</td></tr>
+          <tr><td>24</td><td>28/02/2026</td><td>17:00</td><td>H</td><td>SVV Scheveningen</td><td>-:-</td></tr>
+          <tr><td>25</td><td>07/03/2026</td><td>13:30</td><td>A</td><td>VV Zwaluwen</td><td>-:-</td></tr>
+          <tr><td>26</td><td>15/03/2026</td><td>13:00</td><td>H</td><td>RKSV Groene Ster</td><td>-:-</td></tr>
+          <tr><td>27</td><td>21/03/2026</td><td>13:30</td><td>A</td><td>VV Noordwijk</td><td>-:-</td></tr>
+          <tr><td>28</td><td>28/03/2026</td><td>17:00</td><td>H</td><td>SteDoCo</td><td>-:-</td></tr>
+          <tr><td>29</td><td>11/04/2026</td><td>14:00</td><td>A</td><td>VV Kloetinge</td><td>-:-</td></tr>
+          <tr><td>30</td><td>19/04/2026</td><td>13:00</td><td>H</td><td>SV TOGB</td><td>-:-</td></tr>
+          <tr><td>31</td><td>25/04/2026</td><td>14:00</td><td>A</td><td>ASWH Ido-Ambacht</td><td>-:-</td></tr>
+          <tr><td>32</td><td>10/05/2026</td><td>13:00</td><td>H</td><td>Blauw Geel '38</td><td>-:-</td></tr>
+          <tr><td>33</td><td>16/05/2026</td><td>–</td><td>A</td><td>FC Lisse</td><td>-:-</td></tr>
+          <tr><td>34</td><td>23/05/2026</td><td>–</td><td>H</td><td>UDI'19/Beter Bed</td><td>-:-</td></tr>
+        </table>
+      </div>
     </section>
 
     <!-- Squad -->
