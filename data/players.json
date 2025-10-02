@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "number": 3,
+    "name": "Perry Bierkens",
+    "position": "DF",
+    "nationality": "NL",
+    "photo": "https://rbc.svsplus.nl/php/image.php?image=perry-bierkens-3-.jpg&category=members"
+  },
+  {
+    "number": 25,
+    "name": "Myron Bostdorp",
+    "position": "MF",
+    "nationality": "NL",
+    "photo": "https://rbc.svsplus.nl/php/image.php?image=myron-bostdorp-25-.jpg&category=members"
+  }
+]
