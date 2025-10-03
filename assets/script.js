@@ -1,17 +1,28 @@
-/* ============================
-   Fixtures Loader (+ Next 5)
-   ============================ */
+/* === Utilities === */
+function parseNLDate(dateStr, timeStr) {
+  // dateStr "DD/MM/YYYY", timeStr "HH:MM" or ""
+  const [d,m,y] = (dateStr || '').split('/').map(Number);
+  let hh = 0, mm = 0;
+  if (timeStr && timeStr.includes(':')) {
+    const parts = timeStr.split(':').map(Number);
+    hh = parts[0] || 0; mm = parts[1] || 0;
+  }
+  // Construct as local time
+  return new Date(y, (m||1)-1, d||1, hh, mm, 0, 0);
+}
+
+/* === Fixtures Loader === */
 (async function initFixtures(){
   try {
     const res = await fetch('./data/fixtures.json?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
+    const fixtures = await res.json();
 
-    function fillTable(bodyId, fixtures) {
+    function fillTable(bodyId, list) {
       const tbody = document.getElementById(bodyId);
       if (!tbody) return;
       tbody.innerHTML = '';
-      fixtures.forEach(f => {
+      (list || []).forEach(f => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${f.round || ''}</td>
@@ -25,61 +36,57 @@
       });
     }
 
-    // Tables
-    if (data.cup) fillTable('cup-body', data.cup);
-    if (data.league) fillTable('league-body', data.league);
+    if (fixtures.cup) fillTable('cup-body', fixtures.cup);
+    if (fixtures.league) fillTable('league-body', fixtures.league);
 
-    // Next 5 (cup + league)
-    const all = []
-      .concat(Array.isArray(data.league) ? data.league : [])
-      .concat(Array.isArray(data.cup) ? data.cup : []);
+    // Next 5 from cup+league (future or not-yet-played)
+    (function fillNext5(){
+      const box = document.getElementById('next5');
+      if (!box) return;
+      box.innerHTML = '';
 
-    const parseNL = (d) => {
-      // expect DD/MM/YYYY
-      if (!d || typeof d !== 'string') return null;
-      const [dd, mm, yyyy] = d.split('/').map(Number);
-      if (!dd || !mm || !yyyy) return null;
-      return new Date(yyyy, mm - 1, dd);
-    };
+      const now = new Date();
+      const all = []
+        .concat((fixtures.cup||[]).map(x => ({...x, comp:'Beker'})))
+        .concat((fixtures.league||[]).map(x => ({...x, comp:'Derde Divisie B'})));
 
-    const now = new Date();
-    const upcoming = all
-      .map(f => ({ ...f, _date: parseNL(f.date) }))
-      .filter(f => {
-        if (!f._date) return false;
-        // show if in the future OR result is blank / "-:-"
-        const future = f._date >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const noScore = !f.result || f.result.trim() === '-:-';
-        return future || noScore;
-      })
-      .sort((a,b) => (a._date - b._date))
-      .slice(0,5);
+      const upcoming = all.filter(x => {
+        const dt = parseNLDate(x.date, x.time);
+        // Show if result looks not played "-:-" OR date/time in the future
+        const isNotPlayed = (x.result || '').includes('-:-');
+        return isNotPlayed || (dt.getTime() >= now.getTime());
+      }).sort((a,b) => parseNLDate(a.date,a.time) - parseNLDate(b.date,b.time))
+        .slice(0,5);
 
-    const next5 = document.getElementById('next5');
-    if (next5) {
-      next5.innerHTML = '';
       if (!upcoming.length) {
-        next5.innerHTML = '<li class="muted">Geen komende wedstrijden gevonden.</li>';
-      } else {
-        upcoming.forEach(m => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <span>${m.date || ''} ${m.time || ''} • ${m.place || ''}</span>
-            &nbsp;—&nbsp;<strong>${m.opponent || ''}</strong>
-          `;
-          next5.appendChild(li);
-        });
+        const li = document.createElement('li');
+        li.className = 'muted';
+        li.textContent = 'Geen komende wedstrijden.';
+        box.appendChild(li);
+        return;
       }
-    }
+
+      upcoming.forEach(x => {
+        const li = document.createElement('li');
+        const date = x.date || '';
+        const time = x.time || '';
+        const place = x.place || '';
+        const opp = x.opponent || '';
+        const res = x.result || '-:-';
+        li.innerHTML = `
+          <div><strong>${opp}</strong> <span class="muted">(${x.comp}${x.round? ' • Ronde ' + x.round : ''})</span></div>
+          <div class="muted">${date}${time ? ' • ' + time : ''} • ${place ? (place === 'H' ? 'Thuis' : 'Uit') : ''} — <span>${res}</span></div>
+        `;
+        box.appendChild(li);
+      });
+    })();
+
   } catch (e) {
     console.error('[RBC] fixtures.json load error', e);
   }
 })();
 
-
-/* ============================
-   Squad Loader
-   ============================ */
+/* === Squad Loader === */
 (async function initSquad(){
   const box = document.getElementById('squad-list');
   const empty = document.getElementById('squad-empty');
@@ -88,12 +95,10 @@
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const payload = await res.json();
     const list = Array.isArray(payload) ? payload : (Array.isArray(payload.players) ? payload.players : []);
-
     if (!list.length) {
-      if (empty) empty.style.display = 'block';
+      if (empty) empty.style.display='block';
       return;
     }
-
     const frag = document.createDocumentFragment();
     list.forEach(p => {
       const card = document.createElement('div');
@@ -120,65 +125,108 @@
       card.appendChild(h3);
       frag.appendChild(card);
     });
-
-    if (box) box.appendChild(frag);
-
+    box.appendChild(frag);
   } catch (e) {
     console.error('[RBC] players.json load error', e);
-    if (empty) empty.style.display = 'block';
+    if (empty) empty.style.display='block';
   }
 })();
 
+/* === X/Twitter On-Demand + RSS Fallback === */
+(function setupTwitterOnDemand(){
+  const btn = document.getElementById('load-x');
+  const statusEl = document.getElementById('tw-status');
+  const wrap = document.getElementById('tw-container');
+  const fallbackNote = document.getElementById('tw-fallback');
+  const rssList = document.getElementById('tw-rss');
+  if (!btn || !wrap) return;
 
-/* ============================
-   Twitter / X Embed (robust)
-   ============================ */
-(function initTwitterEmbed(){
-  // If user removed the block, do nothing.
-  const anchor = document.querySelector('a.twitter-timeline[href*="twitter.com/RBCvoetbal"]');
-  if (!anchor) return;
-
-  // If twttr is present, just (re)load.
-  function loadWidget(){
+  async function renderRSSFallback() {
     try {
-      if (window.twttr && window.twttr.widgets && typeof window.twttr.widgets.load === 'function') {
-        window.twttr.widgets.load();
-        return true;
-      }
-    } catch(e){ /* noop */ }
-    return false;
+      // Use a public RSS->JSON converter (may rate limit if hammered).
+      const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://nitter.net/RBCvoetbal/rss');
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('RSS HTTP ' + res.status);
+      const data = await res.json();
+      const items = (data.items || []).slice(0,5);
+      if (!items.length) throw new Error('Geen items');
+
+      rssList.innerHTML = '';
+      items.forEach(it => {
+        const li = document.createElement('li');
+        li.className = 'tw-item';
+        // Minimal clean up of content
+        const text = it.title || it.description || '';
+        const link = it.link || 'https://twitter.com/RBCvoetbal';
+        li.innerHTML = `<a href="${link}" target="_blank" rel="noopener">${text}</a>`;
+        rssList.appendChild(li);
+      });
+
+      fallbackNote.style.display = 'block';
+      rssList.style.display = 'block';
+      statusEl.textContent = 'Tekstuele updates getoond (fallback).';
+    } catch (err) {
+      console.error('RSS fallback error:', err);
+      fallbackNote.style.display = 'block';
+      rssList.style.display = 'none';
+      statusEl.textContent = 'Kon geen live updates laden.';
+    }
   }
 
-  // Inject the script if not there
-  function ensureScript(cb){
-    if (window.twttr && window.twttr.widgets) {
-      cb && cb();
-      return;
+  function injectTimeline(){
+    btn.disabled = true;
+    statusEl.textContent = 'Bezig met laden…';
+    fallbackNote.style.display = 'none';
+    rssList.style.display = 'none';
+
+    // Create anchor for widgets.js to transform
+    const a = document.createElement('a');
+    a.className = 'twitter-timeline';
+    a.href = 'https://twitter.com/RBCvoetbal';
+    a.setAttribute('data-height','650');
+    a.setAttribute('data-theme','dark');
+    a.setAttribute('data-dnt','true');
+    a.setAttribute('data-chrome','noheader nofooter noborders transparent');
+    a.textContent = 'Tweets by @RBCvoetbal';
+    wrap.innerHTML = '';
+    wrap.appendChild(a);
+
+    let triedRSS = false;
+
+    function tryRSSOnce() {
+      if (triedRSS) return;
+      triedRSS = true;
+      renderRSSFallback();
+      btn.disabled = false;
+      btn.textContent = 'Opnieuw proberen';
     }
+
+    // Load widgets.js (once)
     if (!document.querySelector('script[src*="platform.twitter.com/widgets.js"]')) {
       const s = document.createElement('script');
-      s.src = 'https://platform.twitter.com/widgets.js';
       s.async = true;
+      s.src = 'https://platform.twitter.com/widgets.js';
       s.charset = 'utf-8';
-      s.onload = cb;
+      s.onload = () => {
+        if (window.twttr && window.twttr.widgets) window.twttr.widgets.load(wrap);
+      };
+      s.onerror = tryRSSOnce;
       document.body.appendChild(s);
-    } else {
-      // script tag exists but maybe not executed yet
-      setTimeout(cb, 500);
+    } else if (window.twttr && window.twttr.widgets && window.twttr.widgets.load) {
+      window.twttr.widgets.load(wrap);
     }
+
+    // If after ~6s no iframe appeared, assume 429/blocked and fallback to RSS.
+    setTimeout(() => {
+      const iframe = wrap.querySelector('iframe');
+      if (!iframe) {
+        statusEl.textContent = 'X geblokkeerd of tijdelijk beperkt – toon tekstuele updates.';
+        tryRSSOnce();
+      } else {
+        statusEl.textContent = 'Live tweets geladen.';
+      }
+    }, 6000);
   }
 
-  // Try now, then retry a couple of times if blocked by extensions
-  if (!loadWidget()) {
-    ensureScript(() => {
-      let attempts = 0;
-      const maxAttempts = 5;
-      const tick = () => {
-        attempts++;
-        if (loadWidget()) return;
-        if (attempts < maxAttempts) setTimeout(tick, 800);
-      };
-      tick();
-    });
-  }
+  btn.addEventListener('click', injectTimeline);
 })();
