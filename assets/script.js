@@ -31,6 +31,34 @@
   }
 })();
 
+    // === Next 5 fixtures ===
+    const now = new Date();
+    let all = [];
+    if (Array.isArray(data.cup)) all = all.concat(data.cup);
+    if (Array.isArray(data.league)) all = all.concat(data.league);
+
+    // Parse date & time
+    const parsed = all.map(f => {
+      const dt = f.date && f.time ? new Date(f.date.split('/').reverse().join('-') + 'T' + (f.time || '00:00')) : null;
+      return { ...f, datetime: dt };
+    }).filter(f => f.datetime && f.datetime >= now);
+
+    parsed.sort((a, b) => a.datetime - b.datetime);
+    const next5 = parsed.slice(0, 5);
+
+    const list = document.getElementById('next-list');
+    const empty = document.getElementById('next-empty');
+    if (next5.length === 0) {
+      empty.style.display = 'block';
+    } else {
+      const frag = document.createDocumentFragment();
+      next5.forEach(f => {
+        const li = document.createElement('li');
+        li.textContent = `${f.date} ${f.time} — ${f.opponent} (${f.place})`;
+        frag.appendChild(li);
+      });
+      list.appendChild(frag);
+    }
 
 // === Squad Loader ===
 (async function initSquad(){
