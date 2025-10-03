@@ -130,7 +130,21 @@
     <!-- Twitter/X Live updates -->
     <section class="card" id="live-updates">
       <h2>Live updates</h2>
-      <div id="x-timeline" class="muted">Laden…</div>
+      <div id="x-card">
+        <!-- Plain link is visible by default (fallback), JS will enhance it if possible -->
+        <a id="x-anchor"
+           class="twitter-timeline"
+           data-theme="dark"
+           data-chrome="noheader nofooter noborders transparent"
+           href="https://twitter.com/RBCvoetbal">
+           Tweets by @RBCvoetbal
+        </a>
+        <noscript>
+          <p class="fail">JavaScript staat uit. Bekijk de updates op
+            <a class="btn" href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">twitter.com/RBCvoetbal</a>
+          </p>
+        </noscript>
+      </div>
     </section>
   </main>
 
@@ -142,38 +156,59 @@
     // Footer year
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Robust Twitter/X embed: create programmatically (works if auto-init fails)
+    // Try to enhance the plain link into an embedded timeline.
     (function(){
-      function buildTimeline(){
-        if (!window.twttr || !twttr.widgets) return;
-        const box = document.getElementById('x-timeline');
-        box.innerHTML = '';
-        twttr.widgets.createTimeline(
-          { sourceType: 'profile', screenName: 'RBCvoetbal' },
-          box,
-          { theme: 'dark', height: 600, chrome: 'noheader nofooter noborders transparent', dnt: true }
-        ).catch(() => {
-          box.innerHTML = '<p class="fail">Kon Twitter niet laden. <a class="btn" href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal</a></p>';
-        });
+      const anchor = document.getElementById('x-anchor');
+      const card = document.getElementById('x-card');
+
+      function enhance(){
+        if (!window.twttr || !twttr.widgets) return false;
+        // If the script is there, ask it to render the anchor into an iframe
+        twttr.widgets.load(card);
+        return true;
       }
+
       function loadScript(){
-        if (window.twttr && twttr.widgets){ buildTimeline(); return; }
+        // If widgets already available, enhance immediately
+        if (enhance()) return;
+
+        // Otherwise load the script
         const s = document.createElement('script');
         s.src = 'https://platform.twitter.com/widgets.js';
         s.async = true;
         s.charset = 'utf-8';
-        s.onload = buildTimeline;
-        s.onerror = function(){
-          const box = document.getElementById('x-timeline');
-          box.innerHTML = '<p class="fail">Kan Twitter script niet laden. <a class="btn" href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal</a></p>';
+        s.onload = () => {
+          // Give it a moment, then try to enhance
+          setTimeout(() => {
+            if (!enhance()){
+              // Leave the fallback link as-is
+              anchor.style.display = 'inline-block';
+            }
+          }, 100);
+        };
+        s.onerror = () => {
+          // Script blocked or failed — keep the plain link visible and add a button style
+          anchor.classList.add('btn');
+          anchor.textContent = 'Open @RBCvoetbal op X';
         };
         document.body.appendChild(s);
+
+        // Safety timeout: if nothing happened after 4s, keep the link visible
+        setTimeout(() => {
+          const hasIframe = card.querySelector('iframe');
+          if (!hasIframe) {
+            anchor.style.display = 'inline-block';
+          }
+        }, 4000);
       }
-      document.addEventListener('DOMContentLoaded', loadScript);
+
+      // Ensure the fallback link is visible initially
+      anchor.style.display = 'inline-block';
+      loadScript();
     })();
   </script>
 
-  <!-- Your site logic -->
-  <script src="./assets/script.js?v=4"></script>
+  <!-- Your site logic (fixtures + squad + next5) -->
+  <script src="./assets/script.js?v=5"></script>
 </body>
 </html>
