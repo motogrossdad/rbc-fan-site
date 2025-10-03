@@ -6,10 +6,10 @@
   <title>RBC Roosendaal 25/26</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root{
+    :root {
       --bg:#0b1020;
       --card:#141a2f;
-      --accent:#f1942d; /* club vibe colour */
+      --accent:#f1942d;
       --muted:#94a3b8;
       --text:#e5e7eb;
     }
@@ -37,6 +37,12 @@
     table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;}
     table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
     table.fixtures th{background:rgba(241,148,45,.15);color:var(--accent);font-weight:600;position:sticky;top:0;z-index:2;}
+    .highlight { color: var(--accent); font-weight: 700; }
+
+    /* Next 5 box */
+    #next5-box { border:1px solid rgba(255,255,255,.15); border-radius:.8rem; overflow:hidden; }
+    #next5-box h2 { background:var(--accent); color:#fff; margin:0; padding:.6rem 1rem; font-size:1rem; }
+    #next5 { padding:0.8rem 1rem; font-size:0.9rem; }
 
     /* Squad */
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
@@ -46,11 +52,6 @@
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
 
-    /* Twitter card */
-    #live-updates{overflow:hidden;}
-    #live-updates h2{margin-bottom:.5rem;border-bottom:2px solid var(--accent);padding-bottom:.3rem;color:var(--accent);}
-    .twitter-timeline{border-radius:.6rem !important;}
-    
     footer{text-align:center;color:var(--muted);padding:1rem;font-size:.9rem;border-top:1px solid rgba(255,255,255,.06);margin-top:2rem;}
   </style>
 </head>
@@ -65,7 +66,7 @@
         <a href="#tables">Stand</a>
         <a href="#fixtures">Programma</a>
         <a href="#squad">Selectie</a>
-        <a href="#live-updates">Live updates</a>
+        <a href="#live-updates">Live</a>
       </div>
     </nav>
   </header>
@@ -87,26 +88,20 @@
     <!-- Fixtures -->
     <section class="card" id="fixtures">
       <h2>Programma & Resultaten</h2>
-
       <h3>KNVB Beker 2025/2026</h3>
       <div class="fixtures-wrapper">
         <table class="fixtures">
           <thead>
-            <tr>
-              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
-            </tr>
+            <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
           </thead>
           <tbody id="cup-body"></tbody>
         </table>
       </div>
-
       <h3>Derde Divisie B 2025/2026</h3>
       <div class="fixtures-wrapper">
         <table class="fixtures">
           <thead>
-            <tr>
-              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
-            </tr>
+            <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
           </thead>
           <tbody id="league-body"></tbody>
         </table>
@@ -114,8 +109,8 @@
     </section>
 
     <!-- Next 5 Fixtures -->
-    <section class="card">
-      <h2 style="color:var(--accent);">Komende 5 wedstrijden</h2>
+    <section id="next5-box">
+      <h2>Komende 5 wedstrijden</h2>
       <div id="next5" class="muted">Laden…</div>
     </section>
 
@@ -126,15 +121,21 @@
       <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
     </section>
 
-    <!-- Twitter Live Updates -->
+    <!-- Twitter -->
     <section class="card" id="live-updates">
       <h2>Live updates</h2>
-      <a class="twitter-timeline" 
+      <a class="twitter-timeline"
          data-theme="dark"
          data-height="600"
-         href="https://twitter.com/RBCvoetbal">
+         data-chrome="noheader nofooter noborders transparent"
+         href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">
          Tweets by RBCvoetbal
       </a>
+      <noscript>
+        <p class="muted">Twitter kan niet geladen worden. 
+          <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Bekijk @RBCvoetbal op X</a>.
+        </p>
+      </noscript>
     </section>
   </main>
 
@@ -142,10 +143,19 @@
     © <span id="year"></span> RBC Roosendaal • Fan website
   </footer>
 
+  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+  <script src="./assets/script.js?v=2"></script>
   <script>
-    document.getElementById('year').textContent=new Date().getFullYear();
+    (function loadTwitter(){
+      function mount(){ try { window.twttr && twttr.widgets && twttr.widgets.load(); } catch(e){} }
+      if (window.twttr && twttr.widgets) { mount(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://platform.twitter.com/widgets.js';
+      s.async = true;
+      s.charset = 'utf-8';
+      s.onload = mount;
+      document.head.appendChild(s);
+    })();
   </script>
-  <script src="./assets/script.js?v=1"></script>
-  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>
