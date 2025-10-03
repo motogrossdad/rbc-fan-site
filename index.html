@@ -14,6 +14,8 @@
       --text:#e5e7eb;
     }
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
+
+    /* Navbar */
     header{position:sticky;top:0;background:var(--accent);border-bottom:1px solid rgba(255,255,255,.15);z-index:10;}
     nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;}
     .brand{font-weight:800;font-size:1.1rem;display:flex;align-items:center;color:#fff;}
@@ -21,6 +23,7 @@
     .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;}
     .links a:hover{opacity:.9;}
 
+    /* Layout / cards */
     .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:1100px;margin:1rem auto;padding:0 1rem;}
     .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;}
     h2{margin:0 0 .6rem;}
@@ -54,17 +57,12 @@
     .player h3{margin:.3rem 0;font-size:1rem;}
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
 
-    /* Twitter / X card */
-    .twitter-card{border:1px solid rgba(255,255,255,.08);border-radius:.8rem;overflow:hidden;background:rgba(255,255,255,.03);}
-    .twitter-card h2{background:rgba(241,148,45,.15);padding:.6rem .8rem;margin:0;border-bottom:1px solid rgba(241,148,45,.25);color:var(--accent);}
-    .tw-wrap{padding:.75rem;}
-    .tw-fallback{font-size:.9rem;color:var(--muted);margin-top:.5rem;}
-    .tw-btn{display:inline-block;background:var(--accent);color:#0b1020;font-weight:800;border:none;border-radius:.5rem;padding:.5rem .75rem;cursor:pointer;}
-    .tw-btn:disabled{opacity:.6;cursor:default;}
-    .tw-list{list-style:none;margin:.5rem 0 0;padding:0;}
-    .tw-item{border-bottom:1px dashed rgba(255,255,255,.08);padding:.5rem 0;}
-    .tw-item:last-child{border-bottom:none;}
-    .tw-item a{color:#fff;text-decoration:underline;}
+    /* Latest X card */
+    .latest-x{border:1px solid rgba(241,148,45,.35);border-radius:.8rem;background:linear-gradient(180deg, rgba(241,148,45,.12), rgba(241,148,45,.04));}
+    .latest-x h2{margin:0 0 .5rem;}
+    .x-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:.6rem;padding:.65rem;}
+    .x-meta{font-size:.85rem;color:var(--muted);margin-top:.25rem;}
+    .x-item a{color:#fff;text-decoration:underline;}
   </style>
 </head>
 <body>
@@ -140,19 +138,10 @@
       <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
     </section>
 
-    <!-- Twitter / X -->
-    <section class="twitter-card" id="live-updates">
-      <h2>Live updates</h2>
-      <div class="tw-wrap">
-        <p class="muted" id="tw-status">Voor betere prestaties wordt X pas geladen op verzoek.</p>
-        <button id="load-x" class="tw-btn">Klik om live updates te laden</button>
-        <div id="tw-container" style="margin-top:.6rem;"></div>
-        <div id="tw-fallback" class="tw-fallback" style="display:none;">
-          Lukt inladen via X niet? We tonen hieronder de laatste berichten als tekst.
-          <br>Je kunt ook direct openen: <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">@RBCvoetbal</a>.
-        </div>
-        <ul id="tw-rss" class="tw-list" style="display:none;"></ul>
-      </div>
+    <!-- Latest update (X/Twitter) -->
+    <section class="card latest-x" id="live-update">
+      <h2>Laatste update (X/Twitter)</h2>
+      <div id="latest-x"><p class="muted">Laden…</p></div>
     </section>
   </main>
 
@@ -161,6 +150,6 @@
   </footer>
 
   <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
-  <script src="./assets/script.js?v=3"></script>
+  <script src="./assets/script.js?v=4"></script>
 </body>
 </html>
