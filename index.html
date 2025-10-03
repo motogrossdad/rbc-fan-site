@@ -9,14 +9,14 @@
     :root{
       --bg:#0b1020;
       --card:#141a2f;
-      --accent:#f1942d;
+      --accent:#f1942d; /* club vibe colour */
       --muted:#94a3b8;
       --text:#e5e7eb;
     }
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
     /* Navbar */
     header{position:sticky;top:0;background:var(--accent);border-bottom:1px solid rgba(255,255,255,.15);z-index:10;}
-    nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;flex-wrap:wrap;}
+    nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;}
     .brand{font-weight:800;font-size:1.1rem;display:flex;align-items:center;color:#fff;}
     .brand img{height:40px;margin-right:.5rem;border-radius:.25rem;}
     .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;}
@@ -29,42 +29,14 @@
     h3{margin:.8rem 0 .4rem;color:var(--accent);}
 
     /* Teletext iframes */
-    .iframe-viewport {
-      width:100%;
-      height:70vh;
-      border-radius:.8rem;
-      background:#0e1224;
-      border:0;
-      overflow:hidden;
-      margin-bottom:1rem;
-    }
-    .iframe-viewport iframe {
-      width:100%;
-      height:100%;
-      border:0;
-    }
+    .iframe-viewport{width:100%;height:80vh;border-radius:.8rem;background:#0e1224;border:0;overflow:hidden;margin-bottom:1rem;}
+    .iframe-viewport iframe{width:100%;height:100%;border:0;}
 
     /* Fixtures */
     .fixtures-wrapper{width:100%;overflow:auto;border-radius:.6rem;}
     table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;}
     table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
     table.fixtures th{background:rgba(241,148,45,.15);color:var(--accent);font-weight:600;position:sticky;top:0;z-index:2;}
-
-    /* Next 5 wedstrijden box */
-    #next5-card h2 {
-      background: var(--accent);
-      color: #1b1203;
-      padding:.5rem .8rem;
-      border-radius:.5rem;
-      margin:-1rem -1rem 1rem -1rem; /* full width inside card */
-    }
-    #next5 ul {list-style:none;margin:0;padding:0;}
-    #next5 li {
-      padding:.6rem .4rem;
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    #next5 li:last-child {border-bottom:none;}
-    #next5 strong {color:var(--accent);}
 
     /* Squad */
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
@@ -74,15 +46,12 @@
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
 
+    /* Twitter card */
+    #live-updates{overflow:hidden;}
+    #live-updates h2{margin-bottom:.5rem;border-bottom:2px solid var(--accent);padding-bottom:.3rem;color:var(--accent);}
+    .twitter-timeline{border-radius:.6rem !important;}
+    
     footer{text-align:center;color:var(--muted);padding:1rem;font-size:.9rem;border-top:1px solid rgba(255,255,255,.06);margin-top:2rem;}
-
-    /* Mobile overrides */
-    @media(max-width:600px){
-      .iframe-viewport { height:50vh; }
-      nav { flex-direction:column; align-items:flex-start; }
-      .links { margin-top:.5rem; }
-      .links a { margin: .25rem 0; display:block; }
-    }
   </style>
 </head>
 <body>
@@ -94,9 +63,9 @@
       </div>
       <div class="links">
         <a href="#tables">Stand</a>
-        <a href="#next5-card">Komende 5</a>
         <a href="#fixtures">Programma</a>
         <a href="#squad">Selectie</a>
+        <a href="#live-updates">Live updates</a>
       </div>
     </nav>
   </header>
@@ -113,12 +82,6 @@
       <div class="iframe-viewport">
         <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
       </div>
-    </section>
-
-    <!-- Next 5 Fixtures -->
-    <section class="card" id="next5-card">
-      <h2>Komende 5 wedstrijden</h2>
-      <div id="next5" class="muted">Laden…</div>
     </section>
 
     <!-- Fixtures -->
@@ -150,11 +113,28 @@
       </div>
     </section>
 
+    <!-- Next 5 Fixtures -->
+    <section class="card">
+      <h2 style="color:var(--accent);">Komende 5 wedstrijden</h2>
+      <div id="next5" class="muted">Laden…</div>
+    </section>
+
     <!-- Squad -->
     <section class="card" id="squad">
       <h2>Selectie</h2>
       <div class="squad" id="squad-list"></div>
       <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
+    </section>
+
+    <!-- Twitter Live Updates -->
+    <section class="card" id="live-updates">
+      <h2>Live updates</h2>
+      <a class="twitter-timeline" 
+         data-theme="dark"
+         data-height="600"
+         href="https://twitter.com/RBCvoetbal">
+         Tweets by RBCvoetbal
+      </a>
     </section>
   </main>
 
@@ -165,6 +145,7 @@
   <script>
     document.getElementById('year').textContent=new Date().getFullYear();
   </script>
-  <script src="./assets/script.js?v=4"></script>
+  <script src="./assets/script.js?v=1"></script>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>
