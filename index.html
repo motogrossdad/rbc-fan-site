@@ -122,6 +122,8 @@
   <script>
     document.getElementById('year').textContent=new Date().getFullYear();
   </script>
-  <script src="./assets/script.js?v=1"></script>
+  <script>
+  document.write('<script src="./assets/script.js?v=' + Date.now() + '"><\/script>');
+</script>
 </body>
 </html>
