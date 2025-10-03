@@ -7,234 +7,152 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      /* Hybrid theme */
-      --bg:#ffffff;            /* page background (light) */
-      --text:#111827;          /* main text (dark) */
-      --muted:#6b7280;         /* muted text */
-      --accent:#f1942d;        /* club orange */
-      --navy:#0b1020;          /* deep navy for cards */
-      --navy-2:#141a2f;        /* slightly lighter navy accents */
-      --border:rgba(0,0,0,.08);
-      --white:#ffffff;
+      --bg:#ffffff;       /* White background for hybrid theme */
+      --card:#141a2f;     /* Dark navy cards */
+      --accent:#f1942d;   /* RBC orange */
+      --muted:#94a3b8;
+      --text:#0b1020;
     }
-
-    /* Global */
-    html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);}
-    img{max-width:100%;display:block}
-
-    /* Navbar (sticky + shadow) */
-    header{
-      position:sticky; top:0; z-index:20;
-      background:var(--accent);
-      border-bottom:1px solid rgba(255,255,255,.15);
-      box-shadow:0 8px 22px rgba(0,0,0,.12);
-    }
+    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
+    /* Navbar */
+    header{position:sticky;top:0;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:10;}
     nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;}
-    .brand{font-weight:800;font-size:1.1rem;display:flex;align-items:center;color:#fff;gap:.55rem}
-    .brand img{height:44px;width:auto;border-radius:.25rem}
-    .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;opacity:.95}
-    .links a:hover{opacity:1; text-decoration:underline}
+    .brand{font-weight:800;font-size:1.1rem;display:flex;align-items:center;color:#fff;}
+    .brand img{height:40px;margin-right:.5rem;border-radius:.25rem;}
+    .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;}
+    .links a:hover{opacity:.9;}
 
     /* Layout / cards */
     .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:1100px;margin:1rem auto;padding:0 1rem;}
-    .card{
-      background:var(--navy);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:.9rem;
-      padding:0; /* we'll use inner wrappers */
-      color:#e5e7eb;
-      overflow:hidden;
-      box-shadow:0 12px 26px rgba(11,16,32,.25);
-    }
-    .card-body{padding:1rem}
-    h2{margin:0;font-size:1.25rem;font-weight:800;color:#fff}
-    h3{margin:1rem 0 .5rem;color:var(--accent)}
-
-    /* Section banner headers (solid orange bar) */
-    .section-bar{
-      background:var(--accent);
-      color:#fff;
-      padding:.7rem 1rem;
-      font-weight:800;
-      letter-spacing:.2px;
-      display:flex;align-items:center;gap:.5rem;
-    }
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;color:var(--text);}
+    .card h2{margin:0 0 .6rem;padding:.4rem .6rem;background:var(--accent);color:#fff;border-radius:.4rem;}
+    h3{margin:.8rem 0 .4rem;color:var(--accent);}
 
     /* Teletext iframes */
-    .iframe-viewport{width:100%;height:70vh;border:0;background:var(--navy-2);}
+    .iframe-viewport{width:100%;height:70vh;border-radius:.8rem;background:#0e1224;border:0;overflow:hidden;margin-bottom:1rem;}
     .iframe-viewport iframe{width:100%;height:100%;border:0;}
-    @media (max-width: 640px){
-      .iframe-viewport{height:60vh}
-    }
 
-    /* Fixtures tables (sticky head + scroll) */
-    .fixtures-wrapper{width:100%;overflow:auto}
-    table.fixtures{width:100%;border-collapse:collapse;font-size:.92rem;min-width:680px;color:#e5e7eb}
-    table.fixtures th,table.fixtures td{
-      border:1px solid rgba(255,255,255,.12);
-      padding:.55rem .65rem;text-align:center;
-    }
-    table.fixtures th{
-      background:rgba(241,148,45,.18);
-      color:#fff;font-weight:700;position:sticky;top:0;z-index:1;
-      backdrop-filter:saturate(120%) blur(2px);
-    }
-    table.fixtures tbody tr:nth-child(even){background:rgba(255,255,255,.03)}
-    .opp{font-weight:700;color:#fff}
+    /* Fixtures */
+    .fixtures-wrapper{width:100%;overflow:auto;border-radius:.6rem;}
+    table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;background:#1d2238;color:#fff;}
+    table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
+    table.fixtures th{background:var(--accent);color:#fff;font-weight:600;position:sticky;top:0;z-index:2;}
+    table.fixtures td.opponent{color:var(--accent);font-weight:700;}
 
-    /* Next 5 box list */
-    .next5{list-style:none;margin:0;padding:0}
-    .next5 li{display:flex;justify-content:space-between;gap:.75rem;padding:.6rem .75rem;border-bottom:1px dashed rgba(255,255,255,.12)}
-    .next5 li:last-child{border-bottom:none}
-    .chip{display:inline-block;background:rgba(255,255,255,.15);color:#fff;padding:.15rem .5rem;border-radius:.5rem;font-size:.78rem;font-weight:700}
-    .muted{color:#cbd5e1}
+    /* Next 5 box */
+    #next5{background:#1d2238;padding:1rem;border-radius:.6rem;color:#fff;}
+    #next5 ul{margin:0;padding-left:1.2rem;}
+    #next5 h3{margin-top:0;}
 
-    /* Squad grid with hover */
-    .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;padding:1rem}
-    .player{
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);
-      border-radius:.75rem;padding:.7rem;text-align:center;position:relative;overflow:hidden;
-      transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
-    }
-    .player:hover{
-      transform:scale(1.03);
-      box-shadow:0 14px 30px rgba(0,0,0,.35);
-      background:rgba(255,255,255,.07);
-    }
-    .player img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:.55rem;margin-bottom:.5rem;background:#0e1224}
-    .player h3{margin:.35rem 0 .2rem;font-size:1rem;color:#fff}
-    .badge{
-      position:absolute;top:.55rem;left:.55rem;
-      background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;
-      font-weight:800;font-size:.78rem;box-shadow:0 2px 6px rgba(0,0,0,.3);
-    }
+    /* Squad */
+    .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
+    .player{background:rgba(255,255,255,.05);border-radius:.6rem;padding:.6rem;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
+    .player:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.4);}
+    .player img{width:100%;border-radius:.6rem;margin-bottom:.5rem;display:block;}
+    .player h3{margin:.3rem 0;font-size:1rem;color:#fff;}
+    .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+    .muted{color:var(--muted);}
 
-    /* Footer ribbon (orange) */
-    footer{
-      margin-top:1.25rem;
-      background:var(--accent);
-      color:#fff;
-      text-align:center;
-      padding:1rem;
-      font-weight:600;
-      letter-spacing:.2px;
-      box-shadow:0 -8px 22px rgba(0,0,0,.12) inset;
-    }
-
-    /* Utility */
-    .pad{padding:1rem}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    /* Footer */
+    footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
   </style>
 </head>
 <body>
-  <!-- NAV -->
   <header>
     <nav>
       <div class="brand">
         <img src="./assets/logo.png" alt="RBC Logo" onerror="this.style.display='none'">
-        <span>RBC Roosendaal 25/26</span>
+        <span id="brand-text">RBC Roosendaal 25/26</span>
       </div>
       <div class="links">
-        <a href="#next">Komende</a>
-        <a href="#fixtures">Programma</a>
         <a href="#tables">Stand</a>
+        <a href="#fixtures">Programma</a>
         <a href="#squad">Selectie</a>
+        <a href="#updates">Live</a>
       </div>
     </nav>
   </header>
 
   <main class="grid">
-    <!-- Next 5 fixtures -->
-    <section class="card" id="next">
-      <div class="section-bar">Komende 5 wedstrijden</div>
-      <div class="card-body">
-        <div id="next5" class="muted">Laden…</div>
-        <ul class="next5" id="next5-list" style="display:none"></ul>
-      </div>
-    </section>
-
-    <!-- Fixtures & Results -->
-    <section class="card" id="fixtures">
-      <div class="section-bar">Programma & Resultaten</div>
-      <div class="card-body pad">
-        <h2 style="margin-bottom:.6rem">KNVB Beker 2025/2026</h2>
-        <div class="fixtures-wrapper">
-          <table class="fixtures">
-            <thead>
-            <tr>
-              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
-            </tr>
-            </thead>
-            <tbody id="cup-body"></tbody>
-          </table>
-        </div>
-
-        <h2 style="margin:.9rem 0 .6rem">Derde Divisie B 2025/2026</h2>
-        <div class="fixtures-wrapper">
-          <table class="fixtures">
-            <thead>
-            <tr>
-              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
-            </tr>
-            </thead>
-            <tbody id="league-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Standings & Results (Teletext) -->
+    <!-- Standings and Results -->
     <section class="card" id="tables">
-      <div class="section-bar">Stand & Uitslagen</div>
-      <div class="card-body">
-        <h2 class="sr-only">Stand</h2>
-        <div class="iframe-viewport">
-          <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand"></iframe>
-        </div>
-        <h2 class="sr-only">Uitslagen</h2>
-        <div class="iframe-viewport" style="margin-top:1rem">
-          <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
-        </div>
+      <h2>Stand & Uitslagen</h2>
+
+      <h3>Stand</h3>
+      <div id="fs-standings"></div>
+      <script>
+        (function (w,d,s,o,f,js,fjs) {
+          w['fsStandingsEmbed']=o;
+          w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
+          js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
+          js.id = o; js.src = f; js.async = 1;
+          fjs.parentNode.insertBefore(js, fjs);
+        }(window, document, 'script', 'mw', 'https://cdn.footystats.org/embeds/standings.js'));
+        mw('params', { leagueID: 15151 });
+      </script>
+
+      <h3>Uitslagen</h3>
+      <div class="iframe-viewport">
+        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
       </div>
     </section>
 
-    <!-- Live updates (X/Twitter) -->
-    <section class="card" id="live">
-      <div class="section-bar">Live updates</div>
-      <div class="card-body">
-        <div id="tweet-error" class="muted" style="display:none">Kon live update niet laden. Open <a href="https://x.com/RBCvoetbal" target="_blank" rel="noopener">@RBCvoetbal</a></div>
-        <div id="tweet-container" class="pad" style="padding:0">
-          <a class="twitter-timeline"
-             data-theme="dark"
-             data-chrome="noheader nofooter noborders"
-             data-height="650"
-             href="https://twitter.com/RBCvoetbal">
-            Tweets by RBCvoetbal
-          </a>
-        </div>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <!-- Fixtures -->
+    <section class="card" id="fixtures">
+      <h2>Programma & Resultaten</h2>
+      <h3>KNVB Beker 2025/2026</h3>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <thead>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
+          </thead>
+          <tbody id="cup-body"></tbody>
+        </table>
       </div>
+
+      <h3>Derde Divisie B 2025/2026</h3>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <thead>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
+          </thead>
+          <tbody id="league-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Next 5 -->
+    <section class="card">
+      <h2>Komende 5 wedstrijden</h2>
+      <div id="next5" class="muted">Laden…</div>
     </section>
 
     <!-- Squad -->
     <section class="card" id="squad">
-      <div class="section-bar">Selectie</div>
+      <h2>Selectie</h2>
       <div class="squad" id="squad-list"></div>
-      <p id="squad-empty" class="muted" style="display:none;padding:0 1rem 1rem">Nog geen spelers toegevoegd.</p>
+      <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
+    </section>
+
+    <!-- Live Updates -->
+    <section class="card" id="updates">
+      <h2>Live updates</h2>
+      <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     </section>
   </main>
 
-  <!-- Footer ribbon -->
   <footer>
     © <span id="year"></span> RBC Roosendaal • Fan website
   </footer>
 
   <script>
-    // Year
     document.getElementById('year').textContent=new Date().getFullYear();
   </script>
-  <!-- Your site JS (fixtures + squad + next5 logic) -->
-  <script src="./assets/script.js?v=2"></script>
+  <script src="./assets/script.js?v=1"></script>
 </body>
 </html>
