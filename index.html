@@ -9,7 +9,7 @@
     :root{
       --bg:#0b1020;
       --card:#141a2f;
-      --accent:#f1942d;
+      --accent:#f1942d; /* club vibe colour */
       --muted:#94a3b8;
       --text:#e5e7eb;
     }
@@ -37,12 +37,6 @@
     table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;}
     table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
     table.fixtures th{background:rgba(241,148,45,.15);color:var(--accent);font-weight:600;position:sticky;top:0;z-index:2;}
-    .highlight{color:var(--accent);font-weight:700;}
-
-    /* Next 5 box */
-    #next5-box{border:1px solid rgba(255,255,255,.15);border-radius:.8rem;overflow:hidden;}
-    #next5-box h2{background:var(--accent);color:#fff;margin:0;padding:.6rem 1rem;font-size:1rem;}
-    #next5{padding:0.8rem 1rem;font-size:0.9rem;}
 
     /* Squad */
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
@@ -52,10 +46,17 @@
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
 
-    /* Twitter card */
-    #x-card .fail{color:var(--muted);}
-    #x-card a.btn{display:inline-block;margin-top:.5rem;background:var(--accent);color:#fff;padding:.4rem .7rem;border-radius:.5rem;text-decoration:none;font-weight:600;}
+    /* Next 5 Fixtures */
+    #next5-box{background:rgba(241,148,45,.1);border-left:4px solid var(--accent);padding:1rem;border-radius:.6rem;}
+    #next5-box h3{margin:0 0 .5rem;color:var(--accent);}
+    #next5-box ul{list-style:none;padding:0;margin:0;}
+    #next5-box li{margin:.4rem 0;}
+    #next5-box strong{color:#fff;}
 
+    /* Twitter */
+    .twitter-box{margin-top:1rem;}
+    .twitter-timeline{width:100%!important;min-height:400px;}
+    
     footer{text-align:center;color:var(--muted);padding:1rem;font-size:.9rem;border-top:1px solid rgba(255,255,255,.06);margin-top:2rem;}
   </style>
 </head>
@@ -70,7 +71,7 @@
         <a href="#tables">Stand</a>
         <a href="#fixtures">Programma</a>
         <a href="#squad">Selectie</a>
-        <a href="#live-updates">Live</a>
+        <a href="#live">Live updates</a>
       </div>
     </nav>
   </header>
@@ -93,11 +94,19 @@
     <section class="card" id="fixtures">
       <h2>Programma & Resultaten</h2>
 
+      <h3>Komende 5 wedstrijden</h3>
+      <div id="next5-box">
+        <h3>Volgende 5</h3>
+        <ul id="next5"><li>Laden…</li></ul>
+      </div>
+
       <h3>KNVB Beker 2025/2026</h3>
       <div class="fixtures-wrapper">
         <table class="fixtures">
           <thead>
-            <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
           </thead>
           <tbody id="cup-body"></tbody>
         </table>
@@ -107,17 +116,13 @@
       <div class="fixtures-wrapper">
         <table class="fixtures">
           <thead>
-            <tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
           </thead>
           <tbody id="league-body"></tbody>
         </table>
       </div>
-    </section>
-
-    <!-- Next 5 Fixtures -->
-    <section id="next5-box">
-      <h2>Komende 5 wedstrijden</h2>
-      <div id="next5" class="muted">Laden…</div>
     </section>
 
     <!-- Squad -->
@@ -127,24 +132,19 @@
       <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
     </section>
 
-    <!-- Twitter/X Live updates -->
-    <section class="card" id="live-updates">
+    <!-- Live Updates -->
+    <section class="card" id="live">
       <h2>Live updates</h2>
-      <div id="x-card">
-        <!-- Plain link is visible by default (fallback), JS will enhance it if possible -->
-        <a id="x-anchor"
-           class="twitter-timeline"
+      <div class="twitter-box">
+        <a class="twitter-timeline" 
+           href="https://twitter.com/RBCvoetbal"
            data-theme="dark"
-           data-chrome="noheader nofooter noborders transparent"
-           href="https://twitter.com/RBCvoetbal">
+           data-chrome="noheader nofooter noborders"
+           data-tweet-limit="5">
            Tweets by @RBCvoetbal
         </a>
-        <noscript>
-          <p class="fail">JavaScript staat uit. Bekijk de updates op
-            <a class="btn" href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">twitter.com/RBCvoetbal</a>
-          </p>
-        </noscript>
       </div>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     </section>
   </main>
 
@@ -153,62 +153,8 @@
   </footer>
 
   <script>
-    // Footer year
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Try to enhance the plain link into an embedded timeline.
-    (function(){
-      const anchor = document.getElementById('x-anchor');
-      const card = document.getElementById('x-card');
-
-      function enhance(){
-        if (!window.twttr || !twttr.widgets) return false;
-        // If the script is there, ask it to render the anchor into an iframe
-        twttr.widgets.load(card);
-        return true;
-      }
-
-      function loadScript(){
-        // If widgets already available, enhance immediately
-        if (enhance()) return;
-
-        // Otherwise load the script
-        const s = document.createElement('script');
-        s.src = 'https://platform.twitter.com/widgets.js';
-        s.async = true;
-        s.charset = 'utf-8';
-        s.onload = () => {
-          // Give it a moment, then try to enhance
-          setTimeout(() => {
-            if (!enhance()){
-              // Leave the fallback link as-is
-              anchor.style.display = 'inline-block';
-            }
-          }, 100);
-        };
-        s.onerror = () => {
-          // Script blocked or failed — keep the plain link visible and add a button style
-          anchor.classList.add('btn');
-          anchor.textContent = 'Open @RBCvoetbal op X';
-        };
-        document.body.appendChild(s);
-
-        // Safety timeout: if nothing happened after 4s, keep the link visible
-        setTimeout(() => {
-          const hasIframe = card.querySelector('iframe');
-          if (!hasIframe) {
-            anchor.style.display = 'inline-block';
-          }
-        }, 4000);
-      }
-
-      // Ensure the fallback link is visible initially
-      anchor.style.display = 'inline-block';
-      loadScript();
-    })();
+    document.getElementById('year').textContent=new Date().getFullYear();
   </script>
-
-  <!-- Your site logic (fixtures + squad + next5) -->
-  <script src="./assets/script.js?v=5"></script>
+  <script src="./assets/script.js?v=1"></script>
 </body>
 </html>
