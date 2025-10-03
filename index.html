@@ -9,11 +9,12 @@
     :root{
       --bg:#0b1020;
       --card:#141a2f;
-      --accent:#f1942d;
+      --accent:#f1942d; /* club vibe colour */
       --muted:#94a3b8;
       --text:#e5e7eb;
     }
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
+
     /* Navbar */
     header{position:sticky;top:0;background:var(--accent);border-bottom:1px solid rgba(255,255,255,.15);z-index:10;}
     nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;}
@@ -37,6 +38,10 @@
     table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;}
     table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
     table.fixtures th{background:rgba(241,148,45,.15);color:var(--accent);font-weight:600;position:sticky;top:0;z-index:2;}
+
+    /* Next 5 list */
+    #next5 ul{margin:.5rem 0 0 1rem; padding:0;}
+    #next5 li{margin:.25rem 0;}
 
     /* Squad */
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
@@ -76,6 +81,12 @@
       <div class="iframe-viewport">
         <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
       </div>
+    </section>
+
+    <!-- Next 5 fixtures -->
+    <section class="card">
+      <h2>Komende 5 wedstrijden</h2>
+      <div id="next5" class="muted">Laden…</div>
     </section>
 
     <!-- Fixtures -->
@@ -120,10 +131,8 @@
   </footer>
 
   <script>
-    document.getElementById('year').textContent=new Date().getFullYear();
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-  <script>
-  document.write('<script src="./assets/script.js?v=' + Date.now() + '"><\/script>');
-</script>
+  <script src="./assets/script.js?v=1"></script>
 </body>
 </html>
