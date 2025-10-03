@@ -146,31 +146,17 @@
           data-height="650"
           data-theme="dark"
           data-dnt="true"
-          data-chrome="noheader nofooter noborders transparent"
+          data-chrome="noheader nofooter noborders"
         >Tweets by @RBCvoetbal</a>
 
-        <!-- Required script (place AFTER the anchor). If blocked by the browser, the link above remains as fallback. -->
         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-        <div id="tw-fallback" class="tw-fallback">
-          Zie je geen live tweets? Mogelijk blokkeert je browser externe embeds.
-          <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal op X</a>.
-        </div>
-
-        <script>
-          // Hide the fallback once Twitter's widget API reports ready
-          window.twttr = window.twttr || {};
-          (function waitForTwttr(){
-            if (window.twttr && window.twttr.ready) {
-              window.twttr.ready(function(){
-                var fb = document.getElementById('tw-fallback');
-                if (fb) fb.style.display = 'none';
-              });
-            } else {
-              setTimeout(waitForTwttr, 600);
-            }
-          })();
-        </script>
+        <noscript>
+          <div class="tw-fallback">
+            JavaScript is vereist om de Twitter feed te laden.
+            <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal op X</a>.
+          </div>
+        </noscript>
       </div>
     </section>
   </main>
