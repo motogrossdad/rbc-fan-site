@@ -58,6 +58,8 @@
     .twitter-card h2{background:rgba(241,148,45,.15);padding:.6rem .8rem;margin:0;border-bottom:1px solid rgba(241,148,45,.25);color:var(--accent);}
     .tw-wrap{padding:.75rem;}
     .tw-fallback{font-size:.9rem;color:var(--muted);margin-top:.5rem;}
+    .twitter-btn{display:inline-block;background:var(--accent);color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;font-weight:600;transition:opacity .2s;}
+    .twitter-btn:hover{opacity:.9;}
     @media (max-width:640px){
       .iframe-viewport{height:65vh;}
     }
@@ -151,12 +153,17 @@
 
         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-        <noscript>
-          <div class="tw-fallback">
-            JavaScript is vereist om de Twitter feed te laden.
-            <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal op X</a>.
-          </div>
-        </noscript>
+        <div class="tw-fallback" style="text-align:center;padding:2rem;">
+          <p style="margin-bottom:1rem;color:var(--muted);">⚠️ Twitter feed tijdelijk niet beschikbaar</p>
+          <a 
+            href="https://twitter.com/RBCvoetbal" 
+            target="_blank" 
+            rel="noopener"
+            class="twitter-btn"
+          >
+            Bekijk @RBCvoetbal op X/Twitter →
+          </a>
+        </div>
       </div>
     </section>
   </main>
