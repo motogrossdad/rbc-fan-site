@@ -6,7 +6,7 @@
   <title>RBC Roosendaal 25/26</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
+    :root{
       --bg:#0b1020;
       --card:#141a2f;
       --accent:#f1942d;
@@ -51,6 +51,10 @@
     .player h3{margin:.3rem 0;font-size:1rem;}
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
+
+    /* Twitter card */
+    #x-card .fail{color:var(--muted);}
+    #x-card a.btn{display:inline-block;margin-top:.5rem;background:var(--accent);color:#fff;padding:.4rem .7rem;border-radius:.5rem;text-decoration:none;font-weight:600;}
 
     footer{text-align:center;color:var(--muted);padding:1rem;font-size:.9rem;border-top:1px solid rgba(255,255,255,.06);margin-top:2rem;}
   </style>
@@ -123,24 +127,10 @@
       <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
     </section>
 
-    <!-- Twitter -->
+    <!-- Twitter/X Live updates -->
     <section class="card" id="live-updates">
       <h2>Live updates</h2>
-      <a class="twitter-timeline"
-         data-theme="dark"
-         data-height="600"
-         data-dnt="true"
-         data-chrome="noheader nofooter noborders transparent"
-         href="https://twitter.com/RBCvoetbal">
-         Tweets by RBCvoetbal
-      </a>
-      <!-- IMPORTANT: keep the widgets script directly after the link -->
-      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      <noscript>
-        <p class="muted">Twitter kan niet geladen worden.
-          <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Bekijk @RBCvoetbal op X</a>.
-        </p>
-      </noscript>
+      <div id="x-timeline" class="muted">Laden…</div>
     </section>
   </main>
 
@@ -148,7 +138,42 @@
     © <span id="year"></span> RBC Roosendaal • Fan website
   </footer>
 
-  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
-  <script src="./assets/script.js?v=3"></script>
+  <script>
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Robust Twitter/X embed: create programmatically (works if auto-init fails)
+    (function(){
+      function buildTimeline(){
+        if (!window.twttr || !twttr.widgets) return;
+        const box = document.getElementById('x-timeline');
+        box.innerHTML = '';
+        twttr.widgets.createTimeline(
+          { sourceType: 'profile', screenName: 'RBCvoetbal' },
+          box,
+          { theme: 'dark', height: 600, chrome: 'noheader nofooter noborders transparent', dnt: true }
+        ).catch(() => {
+          box.innerHTML = '<p class="fail">Kon Twitter niet laden. <a class="btn" href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal</a></p>';
+        });
+      }
+      function loadScript(){
+        if (window.twttr && twttr.widgets){ buildTimeline(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://platform.twitter.com/widgets.js';
+        s.async = true;
+        s.charset = 'utf-8';
+        s.onload = buildTimeline;
+        s.onerror = function(){
+          const box = document.getElementById('x-timeline');
+          box.innerHTML = '<p class="fail">Kan Twitter script niet laden. <a class="btn" href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal</a></p>';
+        };
+        document.body.appendChild(s);
+      }
+      document.addEventListener('DOMContentLoaded', loadScript);
+    })();
+  </script>
+
+  <!-- Your site logic -->
+  <script src="./assets/script.js?v=4"></script>
 </body>
 </html>
