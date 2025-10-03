@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#ffffff;       /* White background for hybrid theme */
+      --bg:#ffffff;       /* White background */
       --card:#141a2f;     /* Dark navy cards */
       --accent:#f1942d;   /* RBC orange */
       --muted:#94a3b8;
@@ -24,7 +24,7 @@
 
     /* Layout / cards */
     .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:1100px;margin:1rem auto;padding:0 1rem;}
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;color:var(--text);}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;color:#fff;}
     .card h2{margin:0 0 .6rem;padding:.4rem .6rem;background:var(--accent);color:#fff;border-radius:.4rem;}
     h3{margin:.8rem 0 .4rem;color:var(--accent);}
 
@@ -49,7 +49,7 @@
     .player{background:rgba(255,255,255,.05);border-radius:.6rem;padding:.6rem;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
     .player:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.4);}
     .player img{width:100%;border-radius:.6rem;margin-bottom:.5rem;display:block;}
-    .player h3{margin:.3rem 0;font-size:1rem;color:#fff;}
+    .player h3{margin:.3rem 0;font-size:1rem;}
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
 
@@ -77,20 +77,10 @@
     <!-- Standings and Results -->
     <section class="card" id="tables">
       <h2>Stand & Uitslagen</h2>
-
       <h3>Stand</h3>
-      <div id="fs-standings"></div>
-      <script>
-        (function (w,d,s,o,f,js,fjs) {
-          w['fsStandingsEmbed']=o;
-          w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
-          js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
-          js.id = o; js.src = f; js.async = 1;
-          fjs.parentNode.insertBefore(js, fjs);
-        }(window, document, 'script', 'mw', 'https://cdn.footystats.org/embeds/standings.js'));
-        mw('params', { leagueID: 15151 });
-      </script>
-
+      <div class="iframe-viewport">
+        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand"></iframe>
+      </div>
       <h3>Uitslagen</h3>
       <div class="iframe-viewport">
         <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
@@ -111,7 +101,6 @@
           <tbody id="cup-body"></tbody>
         </table>
       </div>
-
       <h3>Derde Divisie B 2025/2026</h3>
       <div class="fixtures-wrapper">
         <table class="fixtures">
