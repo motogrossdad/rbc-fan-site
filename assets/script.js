@@ -7,7 +7,6 @@ function parseNLDate(dateStr, timeStr) {
     const parts = timeStr.split(':').map(Number);
     hh = parts[0] || 0; mm = parts[1] || 0;
   }
-  // Construct as local time
   return new Date(y, (m||1)-1, d||1, hh, mm, 0, 0);
 }
 
@@ -39,7 +38,7 @@ function parseNLDate(dateStr, timeStr) {
     if (fixtures.cup) fillTable('cup-body', fixtures.cup);
     if (fixtures.league) fillTable('league-body', fixtures.league);
 
-    // Next 5 from cup+league (future or not-yet-played)
+    // Next 5 (cup + league)
     (function fillNext5(){
       const box = document.getElementById('next5');
       if (!box) return;
@@ -52,7 +51,6 @@ function parseNLDate(dateStr, timeStr) {
 
       const upcoming = all.filter(x => {
         const dt = parseNLDate(x.date, x.time);
-        // Show if result looks not played "-:-" OR date/time in the future
         const isNotPlayed = (x.result || '').includes('-:-');
         return isNotPlayed || (dt.getTime() >= now.getTime());
       }).sort((a,b) => parseNLDate(a.date,a.time) - parseNLDate(b.date,b.time))
@@ -132,101 +130,50 @@ function parseNLDate(dateStr, timeStr) {
   }
 })();
 
-/* === X/Twitter On-Demand + RSS Fallback === */
-(function setupTwitterOnDemand(){
-  const btn = document.getElementById('load-x');
-  const statusEl = document.getElementById('tw-status');
-  const wrap = document.getElementById('tw-container');
-  const fallbackNote = document.getElementById('tw-fallback');
-  const rssList = document.getElementById('tw-rss');
-  if (!btn || !wrap) return;
+/* === Latest tweet (text-only, no widget, avoids 429) === */
+(async function latestTweet(){
+  const host = document.getElementById('latest-x');
+  if (!host) return;
 
-  async function renderRSSFallback() {
+  // Helper to format date nicely
+  function formatDate(d){
     try {
-      // Use a public RSS->JSON converter (may rate limit if hammered).
-      const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://nitter.net/RBCvoetbal/rss');
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('RSS HTTP ' + res.status);
-      const data = await res.json();
-      const items = (data.items || []).slice(0,5);
-      if (!items.length) throw new Error('Geen items');
-
-      rssList.innerHTML = '';
-      items.forEach(it => {
-        const li = document.createElement('li');
-        li.className = 'tw-item';
-        // Minimal clean up of content
-        const text = it.title || it.description || '';
-        const link = it.link || 'https://twitter.com/RBCvoetbal';
-        li.innerHTML = `<a href="${link}" target="_blank" rel="noopener">${text}</a>`;
-        rssList.appendChild(li);
-      });
-
-      fallbackNote.style.display = 'block';
-      rssList.style.display = 'block';
-      statusEl.textContent = 'Tekstuele updates getoond (fallback).';
-    } catch (err) {
-      console.error('RSS fallback error:', err);
-      fallbackNote.style.display = 'block';
-      rssList.style.display = 'none';
-      statusEl.textContent = 'Kon geen live updates laden.';
-    }
+      return new Intl.DateTimeFormat('nl-NL', {
+        weekday:'short', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
+      }).format(d);
+    } catch { return d.toLocaleString(); }
   }
 
-  function injectTimeline(){
-    btn.disabled = true;
-    statusEl.textContent = 'Bezig met laden…';
-    fallbackNote.style.display = 'none';
-    rssList.style.display = 'none';
+  // Try fetching via a public RSS->JSON converter of Nitter (no API key).
+  const url = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://nitter.net/RBCvoetbal/rss');
 
-    // Create anchor for widgets.js to transform
-    const a = document.createElement('a');
-    a.className = 'twitter-timeline';
-    a.href = 'https://twitter.com/RBCvoetbal';
-    a.setAttribute('data-height','650');
-    a.setAttribute('data-theme','dark');
-    a.setAttribute('data-dnt','true');
-    a.setAttribute('data-chrome','noheader nofooter noborders transparent');
-    a.textContent = 'Tweets by @RBCvoetbal';
-    wrap.innerHTML = '';
-    wrap.appendChild(a);
+  try {
+    const res = await fetch(url, { cache:'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const item = (data.items && data.items[0]) || null;
 
-    let triedRSS = false;
+    host.innerHTML = ''; // clear “Laden…”
 
-    function tryRSSOnce() {
-      if (triedRSS) return;
-      triedRSS = true;
-      renderRSSFallback();
-      btn.disabled = false;
-      btn.textContent = 'Opnieuw proberen';
+    if (!item) {
+      host.innerHTML = `<p class="muted">Geen update gevonden. <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Bekijk @RBCvoetbal</a></p>`;
+      return;
     }
 
-    // Load widgets.js (once)
-    if (!document.querySelector('script[src*="platform.twitter.com/widgets.js"]')) {
-      const s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://platform.twitter.com/widgets.js';
-      s.charset = 'utf-8';
-      s.onload = () => {
-        if (window.twttr && window.twttr.widgets) window.twttr.widgets.load(wrap);
-      };
-      s.onerror = tryRSSOnce;
-      document.body.appendChild(s);
-    } else if (window.twttr && window.twttr.widgets && window.twttr.widgets.load) {
-      window.twttr.widgets.load(wrap);
-    }
+    const text = (item.title || item.description || '').replace(/<[^>]+>/g,'').trim();
+    const link = item.link || 'https://twitter.com/RBCvoetbal';
+    const when = item.pubDate ? new Date(item.pubDate) : null;
 
-    // If after ~6s no iframe appeared, assume 429/blocked and fallback to RSS.
-    setTimeout(() => {
-      const iframe = wrap.querySelector('iframe');
-      if (!iframe) {
-        statusEl.textContent = 'X geblokkeerd of tijdelijk beperkt – toon tekstuele updates.';
-        tryRSSOnce();
-      } else {
-        statusEl.textContent = 'Live tweets geladen.';
-      }
-    }, 6000);
+    const wrap = document.createElement('div');
+    wrap.className = 'x-item';
+    wrap.innerHTML = `
+      <div>${text} <a href="${link}" target="_blank" rel="noopener">lees verder →</a></div>
+      <div class="x-meta">${when ? formatDate(when) : ''} • bron: @RBCvoetbal</div>
+    `;
+    host.appendChild(wrap);
+
+  } catch (err) {
+    console.error('[RBC] latest tweet load error', err);
+    host.innerHTML = `<p class="muted">Kon live update niet laden. <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal</a></p>`;
   }
-
-  btn.addEventListener('click', injectTimeline);
 })();
