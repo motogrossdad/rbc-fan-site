@@ -31,6 +31,7 @@
     /* Teletext iframes */
     .iframe-viewport{width:100%;height:80vh;border-radius:.8rem;background:#0e1224;border:0;overflow:hidden;margin-bottom:1rem;}
     .iframe-viewport iframe{width:100%;height:100%;border:0;}
+    @media (max-width:640px){ .iframe-viewport{height:65vh;} }
 
     /* Fixtures */
     .fixtures-wrapper{width:100%;overflow:auto;border-radius:.6rem;}
@@ -44,7 +45,7 @@
     .next5-list{list-style:none;margin:0;padding:.8rem;}
     .next5-list li{padding:.45rem .4rem;border-bottom:1px dashed rgba(255,255,255,.08);}
     .next5-list li:last-child{border-bottom:none;}
-    .next5-list strong{color:#fff;text-shadow:0 0 0 rgba(0,0,0,0.2);}
+    .next5-list strong{color:#fff;}
 
     /* Squad */
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
@@ -53,17 +54,13 @@
     .player h3{margin:.3rem 0;font-size:1rem;}
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
 
-    /* Twitter card */
+    /* Twitter / X card */
     .twitter-card{border:1px solid rgba(255,255,255,.08);border-radius:.8rem;overflow:hidden;background:rgba(255,255,255,.03);}
     .twitter-card h2{background:rgba(241,148,45,.15);padding:.6rem .8rem;margin:0;border-bottom:1px solid rgba(241,148,45,.25);color:var(--accent);}
-    .tw-wrap{padding:3rem 1rem;text-align:center;}
-    .twitter-icon{margin-bottom:1rem;color:var(--accent);}
-    .twitter-btn{display:inline-block;background:var(--accent);color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;font-weight:600;transition:all .2s;}
-    .twitter-btn:hover{opacity:.9;transform:translateY(-2px);}
-    
-    @media (max-width:640px){
-      .iframe-viewport{height:65vh;}
-    }
+    .tw-wrap{padding:.75rem;}
+    .tw-fallback{font-size:.9rem;color:var(--muted);margin-top:.5rem;}
+    .tw-btn{display:inline-block;background:var(--accent);color:#0b1020;font-weight:800;border:none;border-radius:.5rem;padding:.5rem .75rem;cursor:pointer;}
+    .tw-btn:disabled{opacity:.6;cursor:default;}
   </style>
 </head>
 <body>
@@ -143,19 +140,13 @@
     <section class="twitter-card" id="live-updates">
       <h2>Live updates</h2>
       <div class="tw-wrap">
-        <svg class="twitter-icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-        </svg>
-        <h3 style="color:var(--accent);margin-bottom:.5rem;">Volg ons op X (Twitter)</h3>
-        <p class="muted" style="margin-bottom:1.5rem;">Blijf op de hoogte van het laatste nieuws en updates</p>
-        <a 
-          href="https://twitter.com/RBCvoetbal" 
-          target="_blank" 
-          rel="noopener"
-          class="twitter-btn"
-        >
-          Bekijk @RBCvoetbal →
-        </a>
+        <p class="muted" id="tw-status">Voor betere prestaties wordt X pas geladen op verzoek.</p>
+        <button id="load-x" class="tw-btn">Klik om live updates te laden</button>
+        <div id="tw-container" style="margin-top:.6rem;"></div>
+        <div id="tw-fallback" class="tw-fallback" style="display:none;">
+          Zie je geen live tweets? Mogelijk blokkeert je browser of is X tijdelijk beperkt (429).
+          <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal op X</a>.
+        </div>
       </div>
     </section>
   </main>
@@ -166,7 +157,62 @@
 
   <script>
     document.getElementById('year').textContent=new Date().getFullYear();
+
+    // On-demand X/Twitter loader to avoid 429 rate limits
+    (function setupTwitterOnDemand(){
+      const btn = document.getElementById('load-x');
+      const statusEl = document.getElementById('tw-status');
+      const wrap = document.getElementById('tw-container');
+      const fallback = document.getElementById('tw-fallback');
+      if (!btn || !wrap) return;
+
+      function injectTimeline(){
+        // Prevent multiple loads
+        btn.disabled = true;
+        statusEl.textContent = 'Bezig met laden…';
+        fallback.style.display = 'none';
+
+        // Anchor required by widgets.js
+        const a = document.createElement('a');
+        a.className = 'twitter-timeline';
+        a.href = 'https://twitter.com/RBCvoetbal';
+        a.setAttribute('data-height','650');
+        a.setAttribute('data-theme','dark');
+        a.setAttribute('data-dnt','true');
+        a.setAttribute('data-chrome','noheader nofooter noborders transparent');
+        a.textContent = 'Tweets by @RBCvoetbal';
+        wrap.appendChild(a);
+
+        // Only add the script once
+        if (!document.querySelector('script[src*="platform.twitter.com/widgets.js"]')) {
+          const s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://platform.twitter.com/widgets.js';
+          s.charset = 'utf-8';
+          document.body.appendChild(s);
+        } else if (window.twttr && window.twttr.widgets && window.twttr.widgets.load) {
+          // If already present, just tell it to parse
+          window.twttr.widgets.load(wrap);
+        }
+
+        // If after ~6s nothing rendered, show fallback (likely 429 or blocked)
+        setTimeout(function(){
+          const iframe = wrap.querySelector('iframe');
+          if (!iframe) {
+            fallback.style.display = 'block';
+            statusEl.textContent = 'Niet gelukt om X te laden.';
+            btn.disabled = false;
+            btn.textContent = 'Opnieuw proberen';
+          } else {
+            statusEl.textContent = 'Live tweets geladen.';
+          }
+        }, 6000);
+      }
+
+      btn.addEventListener('click', injectTimeline);
+    })();
   </script>
+
   <script src="./assets/script.js?v=2"></script>
 </body>
 </html>
