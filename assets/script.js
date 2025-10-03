@@ -26,24 +26,23 @@
     if (data.cup && Array.isArray(data.cup)) fillTable('cup-body', data.cup);
     if (data.league && Array.isArray(data.league)) fillTable('league-body', data.league);
 
-    // === Next 5 fixtures box ===
+    // Next 5 fixtures box (from league entries with "-:-")
     const nextBox = document.getElementById('next5');
-    if (nextBox && data.league) {
-      const upcoming = data.league.filter(f => f.result === "-:-").slice(0,5);
+    if (nextBox && Array.isArray(data.league)) {
+      const upcoming = data.league.filter(f => (f.result || '').trim() === '-:-').slice(0, 5);
+      nextBox.innerHTML = '';
       if (upcoming.length) {
         const ul = document.createElement('ul');
-        ul.className = 'fixtures';
         upcoming.forEach(f => {
           const li = document.createElement('li');
-          li.textContent = `${f.date} ${f.time} — ${f.opponent} (${f.place})`;
+          li.textContent = `${f.date} ${f.time || ''} — ${f.opponent} (${f.place})`;
           ul.appendChild(li);
         });
         nextBox.appendChild(ul);
       } else {
-        nextBox.textContent = "Geen komende wedstrijden.";
+        nextBox.textContent = 'Geen komende wedstrijden.';
       }
     }
-
   } catch (e) {
     console.error('[RBC] fixtures.json load error', e);
   }
@@ -57,7 +56,7 @@
   try {
     const res = await fetch('./data/players.json?v=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
+    const json = await res.json(); // <— important: use `json`, not `data`
     const list = Array.isArray(json) ? json : (Array.isArray(json.players) ? json.players : []);
 
     if (!list.length) {
@@ -92,7 +91,7 @@
       frag.appendChild(card);
     });
 
-    box.innerHTML = ''; // clear before appending
+    box.innerHTML = '';
     box.appendChild(frag);
 
   } catch (e) {
