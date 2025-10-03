@@ -61,6 +61,10 @@
     .tw-fallback{font-size:.9rem;color:var(--muted);margin-top:.5rem;}
     .tw-btn{display:inline-block;background:var(--accent);color:#0b1020;font-weight:800;border:none;border-radius:.5rem;padding:.5rem .75rem;cursor:pointer;}
     .tw-btn:disabled{opacity:.6;cursor:default;}
+    .tw-list{list-style:none;margin:.5rem 0 0;padding:0;}
+    .tw-item{border-bottom:1px dashed rgba(255,255,255,.08);padding:.5rem 0;}
+    .tw-item:last-child{border-bottom:none;}
+    .tw-item a{color:#fff;text-decoration:underline;}
   </style>
 </head>
 <body>
@@ -144,9 +148,10 @@
         <button id="load-x" class="tw-btn">Klik om live updates te laden</button>
         <div id="tw-container" style="margin-top:.6rem;"></div>
         <div id="tw-fallback" class="tw-fallback" style="display:none;">
-          Zie je geen live tweets? Mogelijk blokkeert je browser of is X tijdelijk beperkt (429).
-          <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal op X</a>.
+          Lukt inladen via X niet? We tonen hieronder de laatste berichten als tekst.
+          <br>Je kunt ook direct openen: <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">@RBCvoetbal</a>.
         </div>
+        <ul id="tw-rss" class="tw-list" style="display:none;"></ul>
       </div>
     </section>
   </main>
@@ -155,64 +160,7 @@
     © <span id="year"></span> RBC Roosendaal • Fan website
   </footer>
 
-  <script>
-    document.getElementById('year').textContent=new Date().getFullYear();
-
-    // On-demand X/Twitter loader to avoid 429 rate limits
-    (function setupTwitterOnDemand(){
-      const btn = document.getElementById('load-x');
-      const statusEl = document.getElementById('tw-status');
-      const wrap = document.getElementById('tw-container');
-      const fallback = document.getElementById('tw-fallback');
-      if (!btn || !wrap) return;
-
-      function injectTimeline(){
-        // Prevent multiple loads
-        btn.disabled = true;
-        statusEl.textContent = 'Bezig met laden…';
-        fallback.style.display = 'none';
-
-        // Anchor required by widgets.js
-        const a = document.createElement('a');
-        a.className = 'twitter-timeline';
-        a.href = 'https://twitter.com/RBCvoetbal';
-        a.setAttribute('data-height','650');
-        a.setAttribute('data-theme','dark');
-        a.setAttribute('data-dnt','true');
-        a.setAttribute('data-chrome','noheader nofooter noborders transparent');
-        a.textContent = 'Tweets by @RBCvoetbal';
-        wrap.appendChild(a);
-
-        // Only add the script once
-        if (!document.querySelector('script[src*="platform.twitter.com/widgets.js"]')) {
-          const s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://platform.twitter.com/widgets.js';
-          s.charset = 'utf-8';
-          document.body.appendChild(s);
-        } else if (window.twttr && window.twttr.widgets && window.twttr.widgets.load) {
-          // If already present, just tell it to parse
-          window.twttr.widgets.load(wrap);
-        }
-
-        // If after ~6s nothing rendered, show fallback (likely 429 or blocked)
-        setTimeout(function(){
-          const iframe = wrap.querySelector('iframe');
-          if (!iframe) {
-            fallback.style.display = 'block';
-            statusEl.textContent = 'Niet gelukt om X te laden.';
-            btn.disabled = false;
-            btn.textContent = 'Opnieuw proberen';
-          } else {
-            statusEl.textContent = 'Live tweets geladen.';
-          }
-        }, 6000);
-      }
-
-      btn.addEventListener('click', injectTimeline);
-    })();
-  </script>
-
-  <script src="./assets/script.js?v=2"></script>
+  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+  <script src="./assets/script.js?v=3"></script>
 </body>
 </html>
