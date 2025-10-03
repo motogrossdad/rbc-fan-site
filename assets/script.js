@@ -1,62 +1,49 @@
 /* =========================================================
    RBC Fan Site — assets/script.js
-   - Loads fixtures (cup + league) into tables
-   - Builds “Next 5 wedstrijden” from upcoming fixtures
-   - Loads squad with photos
-   - Pulls latest X/Twitter post text via a CORS-friendly proxy
    ========================================================= */
 
-/* ------------ Helpers ------------ */
-const fmt = {
-  pad: (n) => (n < 10 ? "0" + n : "" + n),
-  // Parse "DD/MM/YYYY" and optional "HH:MM"
-  toDate: (dmy, hm) => {
-    if (!dmy) return null;
-    const [d, m, y] = dmy.split("/").map((x) => parseInt(x, 10));
-    let hh = 0, mm = 0;
-    if (hm && /^\d{1,2}:\d{2}$/.test(hm.trim())) {
-      const parts = hm.split(":");
-      hh = parseInt(parts[0], 10) || 0;
-      mm = parseInt(parts[1], 10) || 0;
-    }
-    // Local time
-    return new Date(y, (m || 1) - 1, d || 1, hh, mm, 0, 0);
-  },
-  // Human readable date/time (NL)
-  nice: (date) => {
-    try {
-      return new Intl.DateTimeFormat("nl-NL", {
-        weekday: "short",
-        day: "2-digit",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(date);
-    } catch {
-      return date.toLocaleString();
-    }
-  },
-};
+/* -------------------------------
+   Small utilities
+--------------------------------- */
+function parseNLDate(dStr = "", tStr = "") {
+  // dStr like "17/08/2025", tStr like "13:00" (optional)
+  const [dd, mm, yyyy] = dStr.split("/").map(Number);
+  if (!dd || !mm || !yyyy) return null;
+  let hh = 12, mi = 0;
+  if (tStr && tStr.includes(":")) {
+    const [h, m] = tStr.split(":").map(s => parseInt(s, 10));
+    if (!Number.isNaN(h)) hh = h;
+    if (!Number.isNaN(m)) mi = m;
+  }
+  return new Date(yyyy, mm - 1, dd, hh, mi, 0, 0);
+}
+
+function createEl(tag, attrs = {}, html = "") {
+  const el = document.createElement(tag);
+  Object.entries(attrs).forEach(([k, v]) => {
+    if (k in el) el[k] = v;
+    else el.setAttribute(k, v);
+  });
+  if (html) el.innerHTML = html;
+  return el;
+}
 
 /* =========================================================
-   Fixtures Loader
-   - fills #cup-body and #league-body
-   - builds the “Next 5 wedstrijden” box (#next5)
+   Fixtures Loader (tables + Next 5)
+   - expects ./data/fixtures.json
+   - { cup: [...], league: [...] }
    ========================================================= */
 (async function initFixtures() {
   try {
     const res = await fetch("./data/fixtures.json?v=" + Date.now(), { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    const fixturesData = await res.json();
+    const data = await res.json();
 
-    /* --- Fill cup & league tables --- */
     function fillTable(bodyId, fixtures) {
       const tbody = document.getElementById(bodyId);
       if (!tbody) return;
       tbody.innerHTML = "";
-      if (!Array.isArray(fixtures) || fixtures.length === 0) return;
-
-      fixtures.forEach((f) => {
+      (fixtures || []).forEach(f => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${f.round || ""}</td>
@@ -70,94 +57,76 @@ const fmt = {
       });
     }
 
-    if (fixturesData.cup) fillTable("cup-body", fixturesData.cup);
-    if (fixturesData.league) fillTable("league-body", fixturesData.league);
+    if (data && Array.isArray(data.cup)) fillTable("cup-body", data.cup);
+    if (data && Array.isArray(data.league)) fillTable("league-body", data.league);
 
-    /* --- Build Next 5 wedstrijden --- */
-    (function fillNextFive() {
-      const host = document.getElementById("next5");
-      if (!host) return;
+    // ---- Next 5 wedstrijden box ----
+    const nextBox = document.getElementById("next5");
+    if (nextBox) {
+      try {
+        const today = new Date();
+        const upcoming = (data.league || [])
+          .filter(m => {
+            const dt = parseNLDate(m.date, m.time);
+            // Treat "-:-" or empty result as upcoming; also include future-dated fixtures even if result accidentally present
+            const noResult = !m.result || m.result === "-:-";
+            return (dt && dt >= new Date(today.getFullYear(), today.getMonth(), today.getDate())) || noResult;
+          })
+          .map(m => ({ ...m, _dt: parseNLDate(m.date, m.time) || new Date(8640000000000000) })) // fallback far future
+          .sort((a, b) => a._dt - b._dt)
+          .slice(0, 5);
 
-      const now = new Date();
-      const rows = [];
-
-      const pushSet = (set, tag) => {
-        if (!Array.isArray(set)) return;
-        set.forEach((g) => {
-          const when = fmt.toDate(g.date, g.time || "00:00");
-          if (!when) return;
-
-          // Consider “upcoming” if result is "-:-" OR date is in the future
-          const isUpcoming = (g.result && g.result.trim() === "-:-") || when >= now;
-          if (!isUpcoming) return;
-
-          rows.push({
-            when,
-            comp: tag, // "Beker" or "League"
-            round: g.round || "",
-            place: g.place || "",
-            opponent: g.opponent || "",
+        if (!upcoming.length) {
+          nextBox.innerHTML = `<p class="muted">Geen komende wedstrijden gevonden.</p>`;
+        } else {
+          const ul = document.createElement("ul");
+          ul.style.listStyle = "none";
+          ul.style.padding = "0";
+          upcoming.forEach(m => {
+            const when = m._dt instanceof Date && !isNaN(m._dt)
+              ? new Intl.DateTimeFormat("nl-NL", {
+                  weekday: "short",
+                  day: "2-digit",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(m._dt)
+              : `${m.date} ${m.time || ""}`.trim();
+            const li = document.createElement("li");
+            li.style.padding = ".5rem 0";
+            li.style.borderBottom = "1px dashed rgba(255,255,255,.12)";
+            li.innerHTML = `
+              <div><span class="muted">${when}</span> • <strong style="color:var(--accent)">${m.opponent || ""}</strong> <span class="muted">(${m.place || ""})</span></div>
+            `;
+            ul.appendChild(li);
           });
-        });
-      };
-
-      pushSet(fixturesData.cup, "Beker");
-      pushSet(fixturesData.league, "League");
-
-      // Sort by date/time ascending
-      rows.sort((a, b) => a.when - b.when);
-
-      const next5 = rows.slice(0, 5);
-
-      host.innerHTML = ""; // clear “Laden…”
-      if (next5.length === 0) {
-        host.innerHTML = `<p class="muted">Geen komende wedstrijden gevonden.</p>`;
-        return;
+          nextBox.innerHTML = "";
+          nextBox.appendChild(ul);
+        }
+      } catch (err) {
+        console.error("[RBC] next5 build error", err);
+        nextBox.innerHTML = `<p class="muted">Kon komende wedstrijden niet laden.</p>`;
       }
-
-      const list = document.createElement("ul");
-      list.className = "next5-list";
-
-      next5.forEach((m) => {
-        const li = document.createElement("li");
-        li.className = "next5-item";
-        li.innerHTML = `
-          <div class="n5-left">
-            <div class="n5-date">${fmt.nice(m.when)}</div>
-            <div class="n5-meta">${m.comp === "Beker" ? "KNVB Beker" : "Derde Divisie B"} • Ronde ${m.round} • ${m.place === "H" ? "Thuis" : "Uit"}</div>
-          </div>
-          <div class="n5-right"><span class="n5-opp">${m.opponent}</span></div>
-        `;
-        list.appendChild(li);
-      });
-
-      host.appendChild(list);
-    })();
+    }
   } catch (e) {
     console.error("[RBC] fixtures.json load error", e);
-    // Graceful fallback
-    const n5 = document.getElementById("next5");
-    if (n5) n5.innerHTML = `<p class="muted">Kon programma niet laden.</p>`;
   }
 })();
 
 /* =========================================================
    Squad Loader
-   - fills #squad-list from data/players.json
-   - accepts either { players: [...] } or [...]
+   - expects ./data/players.json
+   - shape: { "players": [ ... ] }
    ========================================================= */
 (async function initSquad() {
   const box = document.getElementById("squad-list");
   const empty = document.getElementById("squad-empty");
+  if (!box) return;
   try {
     const res = await fetch("./data/players.json?v=" + Date.now(), { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
-    const squadData = await res.json();
-    const list = Array.isArray(squadData)
-      ? squadData
-      : Array.isArray(squadData.players)
-      ? squadData.players
-      : [];
+    const payload = await res.json();
+    const list = Array.isArray(payload) ? payload : (Array.isArray(payload.players) ? payload.players : []);
 
     if (!list.length) {
       if (empty) empty.style.display = "block";
@@ -165,37 +134,27 @@ const fmt = {
     }
 
     const frag = document.createDocumentFragment();
-    list.forEach((p) => {
-      const card = document.createElement("div");
-      card.className = "player";
-
-      // #number badge
-      if (p.number != null && p.number !== "") {
-        const badge = document.createElement("div");
-        badge.className = "badge";
-        badge.textContent = "#" + p.number;
+    list.forEach(p => {
+      const card = createEl("div", { className: "player" });
+      if (p.number) {
+        const badge = createEl("div", { className: "badge", textContent: "#" + p.number });
         card.appendChild(badge);
       }
+      const img = createEl("img", {
+        alt: (p.name || "Speler") + " foto",
+        loading: "lazy",
+        decoding: "async",
+      });
+      if (p.photo) img.src = p.photo;
+      img.onerror = () => { img.style.display = "none"; };
 
-      // photo
-      const img = document.createElement("img");
-      img.alt = (p.name || "Speler") + " foto";
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.src = p.photo || "";
-      img.onerror = () => {
-        // hide if broken
-        img.style.display = "none";
-      };
-
-      const h3 = document.createElement("h3");
-      h3.textContent = p.name || "Speler";
+      const h3 = createEl("h3", { textContent: p.name || "Speler" });
 
       card.appendChild(img);
       card.appendChild(h3);
       frag.appendChild(card);
     });
-
+    box.innerHTML = "";
     box.appendChild(frag);
   } catch (e) {
     console.error("[RBC] players.json load error", e);
@@ -204,15 +163,21 @@ const fmt = {
 })();
 
 /* =========================================================
-   Latest tweet (text-only) via a CORS-friendly proxy
-   - Avoids official widget & rate-limit issues
-   - Fills #latest-x with the most recent post
+   Latest tweet (text-only) — robust mirrors + Atom/RSS parsing
    ========================================================= */
 (async function latestTweet() {
   const host = document.getElementById("latest-x");
   if (!host) return;
 
-  // HTML entity decoder
+  const MIRRORS = [
+    "https://nitter.net",
+    "https://nitter.poast.org",
+    "https://nitter.fdn.fr",
+    "https://nitter.privacydev.net"
+  ];
+  const PROXY = "https://r.jina.ai/"; // CORS-friendly proxy
+  const HANDLE = "RBCvoetbal";
+
   const decode = (s = "") =>
     s
       .replace(/&amp;/g, "&")
@@ -231,55 +196,77 @@ const fmt = {
         minute: "2-digit",
       }).format(d);
     } catch {
-      return d.toLocaleString();
+      return d?.toLocaleString?.() || "";
     }
   };
 
-  // Jina reader proxy to fetch Nitter RSS (CORS friendly)
-  const rssURL = "https://r.jina.ai/http://nitter.net/RBCvoetbal/rss";
+  async function fetchFromMirror(base) {
+    const url = `${PROXY}${base}/@${HANDLE}/rss`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.text();
+  }
+
+  function parseLatest(xml) {
+    // Try RSS first
+    const item = (xml.match(/<item>[\s\S]*?<\/item>/i) || [])[0];
+    if (item) {
+      const title = ((item.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || "").trim();
+      const link = ((item.match(/<link>([\s\S]*?)<\/link>/i) || [])[1] || "").trim();
+      const pub  = ((item.match(/<pubDate>([\s\S]*?)<\/pubDate>/i) || [])[1] || "").trim();
+      return { title: decode(title), link: decode(link), when: pub ? new Date(pub) : null };
+    }
+    // Fallback: Atom
+    const entry = (xml.match(/<entry>[\s\S]*?<\/entry>/i) || [])[0];
+    if (entry) {
+      const content = ((entry.match(/<content[^>]*>([\s\S]*?)<\/content>/i) || [])[1] || "").trim();
+      const summary = ((entry.match(/<summary>([\s\S]*?)<\/summary>/i) || [])[1] || "").trim();
+      const title   = ((entry.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || "").trim();
+      const linkTag = (entry.match(/<link\b[^>]*>/i) || [])[0] || "";
+      const href    = (linkTag.match(/\bhref="([^"]+)"/i) || [])[1] || `https://twitter.com/${HANDLE}`;
+      const updated = ((entry.match(/<updated>([\s\S]*?)<\/updated>/i) || [])[1] || "").trim();
+      return { title: decode(content || summary || title), link: decode(href), when: updated ? new Date(updated) : null };
+    }
+    return null;
+  }
 
   try {
-    const res = await fetch(rssURL, { cache: "no-store" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const xml = await res.text();
+    host.innerHTML = "Laden…";
+    let xml = null;
+    for (const mirror of MIRRORS) {
+      try {
+        xml = await fetchFromMirror(mirror);
+        if (xml) break;
+      } catch (_) {
+        // try next mirror
+      }
+    }
 
-    const firstItem = (xml.match(/<item>[\s\S]*?<\/item>/i) || [])[0] || "";
-    const rawTitle = ((firstItem.match(/<title>([\s\S]*?)<\/title>/i) || [])[1] || "").trim();
-    const rawLink =
-      ((firstItem.match(/<link>([\s\S]*?)<\/link>/i) || [])[1] || "https://twitter.com/RBCvoetbal").trim();
-    const rawDate = ((firstItem.match(/<pubDate>([\s\S]*?)<\/pubDate>/i) || [])[1] || "").trim();
+    host.innerHTML = ""; // clear loading text
 
-    host.innerHTML = ""; // clear “Laden…”
+    if (!xml) {
+      host.innerHTML =
+        '<p class="muted">Kon live update niet laden. <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">@RBCvoetbal</a></p>';
+      return;
+    }
 
-    if (!rawTitle) {
+    const latest = parseLatest(xml);
+    if (!latest || !latest.title) {
       host.innerHTML =
         '<p class="muted">Geen update gevonden. <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Bekijk @RBCvoetbal</a></p>';
       return;
     }
 
-    const when = rawDate ? new Date(rawDate) : null;
-    const title = decode(rawTitle);
-    const link = decode(rawLink);
-
     const wrap = document.createElement("div");
     wrap.className = "x-item";
     wrap.innerHTML = `
-      <div>${title} <a href="${link}" target="_blank" rel="noopener">lees verder →</a></div>
-      <div class="x-meta">${when ? formatDate(when) : ""} • bron: @RBCvoetbal</div>
+      <div>${latest.title} <a href="${latest.link}" target="_blank" rel="noopener">lees verder →</a></div>
+      <div class="x-meta">${latest.when ? formatDate(latest.when) : ""} • bron: @RBCvoetbal</div>
     `;
-
     host.appendChild(wrap);
   } catch (err) {
     console.error("[RBC] latest tweet load error", err);
     host.innerHTML =
       '<p class="muted">Kon live update niet laden. <a href="https://twitter.com/RBCvoetbal" target="_blank" rel="noopener">Open @RBCvoetbal</a></p>';
   }
-})();
-
-/* =========================================================
-   Footer year
-   ========================================================= */
-(function setYear() {
-  const y = document.getElementById("year");
-  if (y) y.textContent = new Date().getFullYear();
 })();
