@@ -56,10 +56,11 @@
     /* Twitter card */
     .twitter-card{border:1px solid rgba(255,255,255,.08);border-radius:.8rem;overflow:hidden;background:rgba(255,255,255,.03);}
     .twitter-card h2{background:rgba(241,148,45,.15);padding:.6rem .8rem;margin:0;border-bottom:1px solid rgba(241,148,45,.25);color:var(--accent);}
-    .tw-wrap{padding:.75rem;}
-    .tw-fallback{font-size:.9rem;color:var(--muted);margin-top:.5rem;}
-    .twitter-btn{display:inline-block;background:var(--accent);color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;font-weight:600;transition:opacity .2s;}
-    .twitter-btn:hover{opacity:.9;}
+    .tw-wrap{padding:3rem 1rem;text-align:center;}
+    .twitter-icon{margin-bottom:1rem;color:var(--accent);}
+    .twitter-btn{display:inline-block;background:var(--accent);color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;text-decoration:none;font-weight:600;transition:all .2s;}
+    .twitter-btn:hover{opacity:.9;transform:translateY(-2px);}
+    
     @media (max-width:640px){
       .iframe-viewport{height:65vh;}
     }
@@ -142,28 +143,19 @@
     <section class="twitter-card" id="live-updates">
       <h2>Live updates</h2>
       <div class="tw-wrap">
-        <a
-          class="twitter-timeline"
-          href="https://twitter.com/RBCvoetbal"
-          data-height="650"
-          data-theme="dark"
-          data-dnt="true"
-          data-chrome="noheader nofooter noborders"
-        >Tweets by @RBCvoetbal</a>
-
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-        <div class="tw-fallback" style="text-align:center;padding:2rem;">
-          <p style="margin-bottom:1rem;color:var(--muted);">⚠️ Twitter feed tijdelijk niet beschikbaar</p>
-          <a 
-            href="https://twitter.com/RBCvoetbal" 
-            target="_blank" 
-            rel="noopener"
-            class="twitter-btn"
-          >
-            Bekijk @RBCvoetbal op X/Twitter →
-          </a>
-        </div>
+        <svg class="twitter-icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+        <h3 style="color:var(--accent);margin-bottom:.5rem;">Volg ons op X (Twitter)</h3>
+        <p class="muted" style="margin-bottom:1.5rem;">Blijf op de hoogte van het laatste nieuws en updates</p>
+        <a 
+          href="https://twitter.com/RBCvoetbal" 
+          target="_blank" 
+          rel="noopener"
+          class="twitter-btn"
+        >
+          Bekijk @RBCvoetbal →
+        </a>
       </div>
     </section>
   </main>
