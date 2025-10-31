@@ -134,7 +134,39 @@
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     </section>
   </main>
+<!-- 1) Place the widget -->
+<div id="trueping" style="max-width:520px;margin:16px auto;">
+  <div id="trueping-stage" style="
+    position:relative;width:100%;aspect-ratio:16/9;
+    border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;">
+    <div id="dot"  style="position:absolute;width:22px;height:22px;border-radius:50%;background:#2b8;"></div>
+    <div id="ring" style="position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid #2b8;opacity:.0;"></div>
+    <div class="start-spot" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+      <button id="tpStart" style="padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;">Start</button>
+    </div>
+  </div>
+  <div id="tpStatus" style="text-align:center;margin-top:8px;font-weight:700;"></div>
+  <pre id="tpOut" style="background:#f9fafb;padding:10px;border-radius:8px;max-height:220px;overflow:auto;"></pre>
+</div>
 
+<!-- 2) Load the SDK (host it where your site can serve it) -->
+<script src="/trueping-sdk.js"></script>
+
+<!-- 3) Minimal init -->
+<script>
+const ENDPOINT = 'https://trueping.onrender.com';
+const tp = new TruePing({ endpoint: ENDPOINT, stageSelector: '#trueping-stage', trackMs: 3000, clickWindow: 2000 });
+
+document.getElementById('tpStart').addEventListener('click', async () => {
+  document.getElementById('tpStatus').textContent = 'Running…';
+  const { token, verify } = await tp.ping(); // gets nonce/seed automatically if you omit them
+  document.getElementById('tpStatus').textContent = verify.ok ? 'PASS' : 'FAIL';
+  document.getElementById('tpOut').textContent = JSON.stringify({ token, verify }, null, 2);
+
+  // (Optional) send token to your backend for server-side verification:
+  // await fetch('/api/trueping-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token }) });
+});
+</script>
   <footer>
     © <span id="year"></span> RBC Roosendaal • Fan website
   </footer>
