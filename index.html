@@ -59,11 +59,13 @@
     .tp-stage{
       position:relative;width:100%;aspect-ratio:16/9;
       border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;background:#fff;
-      touch-action:none;
+      touch-action:none; user-select:none;
     }
     .tp-grid line{stroke:#e2e8f0;stroke-dasharray:4 5;}
     .tp-dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--tp);box-shadow:0 0 0 5px rgba(43,136,120,.22);pointer-events:none;}
-    .tp-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid var(--tp);opacity:0;pointer-events:none;}
+    .tp-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid var(--tp);opacity:0;pointer-events:none;transform:scale(0.9);}
+    .tp-ring.ring-visible{opacity:1;animation:pulse 1s infinite ease-in-out;}
+    @keyframes pulse{0%{transform:scale(0.9);opacity:.6}50%{transform:scale(1.05);opacity:1}100%{transform:scale(0.9);opacity:.6}}
     .tp-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
     .tp-btn{padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;cursor:pointer;}
     .tp-status{text-align:center;margin-top:.5rem;font-weight:700;}
@@ -160,76 +162,122 @@
         </svg>
         <div class="tp-dot"  id="dot"></div>
         <div class="tp-ring" id="ring"></div>
-        <div class="tp-center"><button class="tp-btn" id="tpStart">Start</button></div>
+        <div class="tp-center" id="tpCenter"><button class="tp-btn" id="tpStart">Start</button></div>
       </div>
       <div id="tpStatus" class="tp-status">Gereed</div>
       <pre id="tpOut" class="tp-pre"></pre>
     </section>
   </main>
 
-  <!-- TruePing SDK -->
+  <!-- Load the hosted SDK ONCE -->
   <script src="https://trueping.onrender.com/trueping-sdk.js"></script>
+
   <script>
-(function () {
-  // 1) Point this to a URL that actually serves your SDK
-  //    If you copied trueping-sdk.js into the same folder as this page, use './trueping-sdk.js'
-  //    If you host it elsewhere, put the full URL (and open it in a tab to confirm it loads).
-  const SDK_URL = './trueping-sdk.js';  // <-- change if needed
-
-  // 2) Your widget element selectors
-  const stageSelector = '#trueping-stage';
-  const startBtn = document.getElementById('tpStart');
-  const statusEl = document.getElementById('tpStatus');
-  const outEl = document.getElementById('tpOut');
-
-  // 3) Load SDK, then boot
-  function boot() {
-    if (!window.TruePing) {
-      console.error('TruePing SDK loaded but window.TruePing is missing.');
-      statusEl.textContent = 'SDK loaded error';
-      return;
+    // ========= Minimal animation helpers (same feel as the demo) =========
+    function randFromSeed(seed){
+      let s = BigInt(seed) & ((1n<<64n)-1n);
+      return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n; const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; };
     }
+    function grad1(h){ return (h*2-1); }
+    function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function makePerlin1D(seed){
+      const rand = randFromSeed(seed);
+      const G = new Float32Array(2048);
+      for(let i=0;i<G.length;i++) G[i] = grad1(rand());
+      return function perlin1(x){
+        const i0 = Math.floor(x) % G.length;
+        const i1 = (i0 + 1) % G.length;
+        const tt = x - Math.floor(x);
+        const g0 = G[i0]*2-1, g1 = G[i1]*2-1;
+        const n0 = g0 * (tt), n1 = g1 * (tt-1);
+        const u = fade(tt);
+        return lerp(n0, n1, u);
+      };
+    }
+    function paramsFromSeed(seed, w, h){
+      const pnX = makePerlin1D(seed ^ 0x9e3779b9);
+      const pnY = makePerlin1D(seed ^ 0x85ebca6b);
+      const cx = w/2, cy = h/2;
+      const Ax = Math.max(50, Math.min(w/2-16, 130));
+      const Ay = Math.max(40, Math.min(h/2-16, 100));
+      const fx = 0.6, fy = 0.8;
+      return { cx, cy, Ax, Ay, fx, fy, pnX, pnY };
+    }
+    function posAt(ms, p){ const t = ms/1000; return { x: p.cx + p.Ax * p.pnX(t * p.fx), y: p.cy + p.Ay * p.pnY(t * p.fy) }; }
+
+    // ========= TruePing init (Option A: hosted SDK) =========
+    const ENDPOINT = 'https://trueping.onrender.com';
+    const stageEl = document.getElementById('trueping-stage');
+    const dot = document.getElementById('dot');
+    const ring = document.getElementById('ring');
+    const center = document.getElementById('tpCenter');
+    const startBtn = document.getElementById('tpStart');
+    const statusEl = document.getElementById('tpStatus');
+    const outEl = document.getElementById('tpOut');
 
     const tp = new TruePing({
-      endpoint: 'https://trueping.onrender.com',
-      stageSelector,
+      endpoint: ENDPOINT,
+      stageSelector: '#trueping-stage',
       trackMs: 3000,
-      clickWindow: 2000
+      clickWindow: 2000,
+      onTick: null
     });
 
+    let raf = null, t0 = null, trackMs = 3000;
+
+    function restartAnim(startedAt, seed){
+      const rect = stageEl.getBoundingClientRect();
+      const p = paramsFromSeed(seed, rect.width, rect.height);
+      if(raf) cancelAnimationFrame(raf);
+      t0 = startedAt;
+      ring.classList.remove('ring-visible');
+
+      function frame(t){
+        let elapsed = t - t0;
+        if(elapsed >= trackMs){
+          elapsed = trackMs;
+          const freeze = posAt(trackMs, p);
+          dot.style.left = (freeze.x - 11) + 'px';
+          dot.style.top  = (freeze.y - 11) + 'px';
+          ring.style.left = (freeze.x - ring.offsetWidth/2) + 'px';
+          ring.style.top  = (freeze.y - ring.offsetHeight/2) + 'px';
+          ring.classList.add('ring-visible');
+          return; // stop anim at freeze
+        } else {
+          const xy = posAt(elapsed, p);
+          dot.style.left = (xy.x - 11) + 'px';
+          dot.style.top  = (xy.y - 11) + 'px';
+          raf = requestAnimationFrame(frame);
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    // Start button → run TruePing
     startBtn.addEventListener('click', async () => {
       statusEl.textContent = 'Running…';
       try {
-        const { token, verify } = await tp.ping(); // auto gets nonce/seed if omitted
+        const { token, verify } = await tp.ping();  // nonce/seed fetched inside
         statusEl.textContent = verify.ok ? 'PASS' : 'FAIL';
         outEl.textContent = JSON.stringify({ token, verify }, null, 2);
       } catch (e) {
-        statusEl.textContent = 'Error starting TruePing';
         console.error(e);
+        statusEl.textContent = 'Error';
+      } finally {
+        // Reveal the center button again for the next attempt
+        center.style.display = 'flex';
       }
     });
-  }
 
-  function loadSDK() {
-    const s = document.createElement('script');
-    s.src = SDK_URL;
-    s.async = true;
-    s.onload = boot;
-    s.onerror = () => {
-      console.error('Failed to load TruePing SDK from:', SDK_URL);
-      statusEl.textContent = 'Failed to load SDK';
-    };
-    document.head.appendChild(s);
-  }
-
-  // Kick it off after DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadSDK);
-  } else {
-    loadSDK();
-  }
-})();
-</script>
+    // When capture starts, hide button + animate path using the dispatched event (seed + startedAt)
+    window.addEventListener('trueping-capture-start', (e) => {
+      // Hide the button during the run
+      center.style.display = 'none';
+      // e.detail: { stageSelector, seed, startedAt }
+      restartAnim(e.detail.startedAt, e.detail.seed);
+    });
+  </script>
 
   <footer>
     © <span id="year"></span> RBC Roosendaal • Fan website
