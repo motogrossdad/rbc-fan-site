@@ -170,96 +170,66 @@
   <!-- TruePing SDK -->
   <script src="https://trueping.onrender.com/trueping-sdk.js"></script>
   <script>
-  // ---- TruePing inline init + minimal animation ----
-  const ENDPOINT = 'https://trueping.onrender.com';
-  const tp = new TruePing({
-    endpoint: ENDPOINT,
-    stageSelector: '#trueping-stage',
-    trackMs: 3000,
-    clickWindow: 2000
-  });
+(function () {
+  // 1) Point this to a URL that actually serves your SDK
+  //    If you copied trueping-sdk.js into the same folder as this page, use './trueping-sdk.js'
+  //    If you host it elsewhere, put the full URL (and open it in a tab to confirm it loads).
+  const SDK_URL = './trueping-sdk.js';  // <-- change if needed
 
-  const stage = document.getElementById('trueping-stage');
-  const dot   = document.getElementById('dot');
-  const ring  = document.getElementById('ring');
+  // 2) Your widget element selectors
+  const stageSelector = '#trueping-stage';
+  const startBtn = document.getElementById('tpStart');
   const statusEl = document.getElementById('tpStatus');
-  const outEl    = document.getElementById('tpOut');
+  const outEl = document.getElementById('tpOut');
 
-  document.getElementById('tpStart').addEventListener('click', async () => {
-    statusEl.textContent = 'Running…';
-    const { token, verify } = await tp.ping();
-    statusEl.textContent = verify.ok ? 'PASS' : 'FAIL';
-    outEl.textContent = JSON.stringify({ token, verify }, null, 2);
-  });
-
-  function randFromSeed(seed){
-    let s = BigInt(seed) & ((1n<<64n)-1n);
-    return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n;
-      const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295;
-    };
-  }
-  function grad1(h){ return (h*2-1); }
-  function fade(t){ return t*t*t*(t*(t*6-15)+10); }
-  function lerp(a,b,t){ return a + (b-a)*t; }
-  function makePerlin1D(seed){
-    const rnd = randFromSeed(seed);
-    const G = new Float32Array(2048);
-    for(let i=0;i<G.length;i++) G[i] = grad1(rnd());
-    return function perlin1(x){
-      const i0 = Math.floor(x) % G.length;
-      const i1 = (i0 + 1) % G.length;
-      const tt = x - Math.floor(x);
-      const g0 = G[i0]*2-1, g1 = G[i1]*2-1;
-      const n0 = g0 * (tt), n1 = g1 * (tt-1);
-      const u = fade(tt);
-      return lerp(n0, n1, u);
-    };
-  }
-  function paramsFromSeed(seed, w, h){
-    const pnX = makePerlin1D(seed ^ 0x9e3779b9);
-    const pnY = makePerlin1D(seed ^ 0x85ebca6b);
-    const cx = w/2, cy = h/2;
-    const Ax = Math.max(50, Math.min(w/2-16, 130));
-    const Ay = Math.max(40, Math.min(h/2-16, 100));
-    const fx = 0.6, fy = 0.8;
-    return { cx, cy, Ax, Ay, fx, fy, pnX, pnY };
-  }
-  function posAt(ms, p){
-    const t = ms/1000;
-    return { x: p.cx + p.Ax * p.pnX(t * p.fx),
-             y: p.cy + p.Ay * p.pnY(t * p.fy) };
-  }
-
-  // Animate the dot for 3s when capture starts, then reveal ring at the freeze point
-  window.addEventListener('trueping-capture-start', (e)=>{
-    const seed = e.detail.seed;
-    const startedAt = e.detail.startedAt;
-    const rect = stage.getBoundingClientRect();
-    const p = paramsFromSeed(seed, rect.width, rect.height);
-    let raf = null;
-    ring.style.opacity = '0';
-
-    function frame(t){
-      let elapsed = t - startedAt;
-      if (elapsed >= 3000){
-        elapsed = 3000;
-        const freeze = posAt(elapsed, p);
-        dot.style.left  = (freeze.x - 11) + 'px';
-        dot.style.top   = (freeze.y - 11) + 'px';
-        ring.style.left = (freeze.x - ring.offsetWidth/2) + 'px';
-        ring.style.top  = (freeze.y - ring.offsetHeight/2) + 'px';
-        ring.style.opacity = '1';
-        cancelAnimationFrame(raf);
-        return;
-      }
-      const xy = posAt(elapsed, p);
-      dot.style.left = (xy.x - 11) + 'px';
-      dot.style.top  = (xy.y - 11) + 'px';
-      raf = requestAnimationFrame(frame);
+  // 3) Load SDK, then boot
+  function boot() {
+    if (!window.TruePing) {
+      console.error('TruePing SDK loaded but window.TruePing is missing.');
+      statusEl.textContent = 'SDK loaded error';
+      return;
     }
-    raf = requestAnimationFrame(frame);
-  });
-  </script>
+
+    const tp = new TruePing({
+      endpoint: 'https://trueping.onrender.com',
+      stageSelector,
+      trackMs: 3000,
+      clickWindow: 2000
+    });
+
+    startBtn.addEventListener('click', async () => {
+      statusEl.textContent = 'Running…';
+      try {
+        const { token, verify } = await tp.ping(); // auto gets nonce/seed if omitted
+        statusEl.textContent = verify.ok ? 'PASS' : 'FAIL';
+        outEl.textContent = JSON.stringify({ token, verify }, null, 2);
+      } catch (e) {
+        statusEl.textContent = 'Error starting TruePing';
+        console.error(e);
+      }
+    });
+  }
+
+  function loadSDK() {
+    const s = document.createElement('script');
+    s.src = SDK_URL;
+    s.async = true;
+    s.onload = boot;
+    s.onerror = () => {
+      console.error('Failed to load TruePing SDK from:', SDK_URL);
+      statusEl.textContent = 'Failed to load SDK';
+    };
+    document.head.appendChild(s);
+  }
+
+  // Kick it off after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSDK);
+  } else {
+    loadSDK();
+  }
+})();
+</script>
 
   <footer>
     © <span id="year"></span> RBC Roosendaal • Fan website
