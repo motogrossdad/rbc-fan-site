@@ -12,6 +12,7 @@
       --accent:#f1942d;   /* RBC orange */
       --muted:#94a3b8;
       --text:#0b1020;
+      --tp:#2b8;          /* TruePing brand */
     }
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
     /* Navbar */
@@ -52,6 +53,21 @@
     .player h3{margin:.3rem 0;font-size:1rem;}
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
+
+    /* TruePing card tweaks */
+    .tp-box{background:#0f142b;border:1px solid rgba(255,255,255,.08);border-radius:.8rem;padding:1rem;}
+    .tp-stage{
+      position:relative;width:100%;aspect-ratio:16/9;
+      border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;background:#fff;
+      touch-action:none;
+    }
+    .tp-grid line{stroke:#e2e8f0;stroke-dasharray:4 5;}
+    .tp-dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--tp);box-shadow:0 0 0 5px rgba(43,136,120,.22);pointer-events:none;}
+    .tp-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid var(--tp);opacity:0;pointer-events:none;}
+    .tp-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+    .tp-btn{padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;cursor:pointer;}
+    .tp-status{text-align:center;margin-top:.5rem;font-weight:700;}
+    .tp-pre{background:#f9fafb;color:#0b1020;padding:10px;border-radius:8px;max-height:220px;overflow:auto;}
 
     /* Footer */
     footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
@@ -133,40 +149,118 @@
       <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
       <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     </section>
+
+    <!-- TruePing Human Check -->
+    <section class="card tp-box" id="trueping-card">
+      <h2>TruePing — Human check</h2>
+      <div class="tp-stage" id="trueping-stage" aria-label="TruePing test area">
+        <svg class="tp-grid" width="100%" height="100%" viewBox="0 0 480 270" preserveAspectRatio="none" style="position:absolute;top:0;left:0;pointer-events:none;">
+          <line x1="240" y1="0"   x2="240" y2="270"/>
+          <line x1="0"   y1="135" x2="480" y2="135"/>
+        </svg>
+        <div class="tp-dot"  id="dot"></div>
+        <div class="tp-ring" id="ring"></div>
+        <div class="tp-center"><button class="tp-btn" id="tpStart">Start</button></div>
+      </div>
+      <div id="tpStatus" class="tp-status">Gereed</div>
+      <pre id="tpOut" class="tp-pre"></pre>
+    </section>
   </main>
-<!-- 1) Place the widget -->
-<div id="trueping" style="max-width:520px;margin:16px auto;">
-  <div id="trueping-stage" style="
-    position:relative;width:100%;aspect-ratio:16/9;
-    border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;">
-    <div id="dot"  style="position:absolute;width:22px;height:22px;border-radius:50%;background:#2b8;"></div>
-    <div id="ring" style="position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid #2b8;opacity:.0;"></div>
-    <div class="start-spot" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-      <button id="tpStart" style="padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;">Start</button>
-    </div>
-  </div>
-  <div id="tpStatus" style="text-align:center;margin-top:8px;font-weight:700;"></div>
-  <pre id="tpOut" style="background:#f9fafb;padding:10px;border-radius:8px;max-height:220px;overflow:auto;"></pre>
-</div>
 
-<!-- 2) Load the SDK (host it where your site can serve it) -->
-<script src="/trueping-sdk.js"></script>
+  <!-- TruePing SDK -->
+  <script src="/trueping-sdk.js"></script>
+  <script>
+  // ---- TruePing inline init + minimal animation ----
+  const ENDPOINT = 'https://trueping.onrender.com';
+  const tp = new TruePing({
+    endpoint: ENDPOINT,
+    stageSelector: '#trueping-stage',
+    trackMs: 3000,
+    clickWindow: 2000
+  });
 
-<!-- 3) Minimal init -->
-<script>
-const ENDPOINT = 'https://trueping.onrender.com';
-const tp = new TruePing({ endpoint: ENDPOINT, stageSelector: '#trueping-stage', trackMs: 3000, clickWindow: 2000 });
+  const stage = document.getElementById('trueping-stage');
+  const dot   = document.getElementById('dot');
+  const ring  = document.getElementById('ring');
+  const statusEl = document.getElementById('tpStatus');
+  const outEl    = document.getElementById('tpOut');
 
-document.getElementById('tpStart').addEventListener('click', async () => {
-  document.getElementById('tpStatus').textContent = 'Running…';
-  const { token, verify } = await tp.ping(); // gets nonce/seed automatically if you omit them
-  document.getElementById('tpStatus').textContent = verify.ok ? 'PASS' : 'FAIL';
-  document.getElementById('tpOut').textContent = JSON.stringify({ token, verify }, null, 2);
+  document.getElementById('tpStart').addEventListener('click', async () => {
+    statusEl.textContent = 'Running…';
+    const { token, verify } = await tp.ping();
+    statusEl.textContent = verify.ok ? 'PASS' : 'FAIL';
+    outEl.textContent = JSON.stringify({ token, verify }, null, 2);
+  });
 
-  // (Optional) send token to your backend for server-side verification:
-  // await fetch('/api/trueping-verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token }) });
-});
-</script>
+  function randFromSeed(seed){
+    let s = BigInt(seed) & ((1n<<64n)-1n);
+    return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n;
+      const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295;
+    };
+  }
+  function grad1(h){ return (h*2-1); }
+  function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function makePerlin1D(seed){
+    const rnd = randFromSeed(seed);
+    const G = new Float32Array(2048);
+    for(let i=0;i<G.length;i++) G[i] = grad1(rnd());
+    return function perlin1(x){
+      const i0 = Math.floor(x) % G.length;
+      const i1 = (i0 + 1) % G.length;
+      const tt = x - Math.floor(x);
+      const g0 = G[i0]*2-1, g1 = G[i1]*2-1;
+      const n0 = g0 * (tt), n1 = g1 * (tt-1);
+      const u = fade(tt);
+      return lerp(n0, n1, u);
+    };
+  }
+  function paramsFromSeed(seed, w, h){
+    const pnX = makePerlin1D(seed ^ 0x9e3779b9);
+    const pnY = makePerlin1D(seed ^ 0x85ebca6b);
+    const cx = w/2, cy = h/2;
+    const Ax = Math.max(50, Math.min(w/2-16, 130));
+    const Ay = Math.max(40, Math.min(h/2-16, 100));
+    const fx = 0.6, fy = 0.8;
+    return { cx, cy, Ax, Ay, fx, fy, pnX, pnY };
+  }
+  function posAt(ms, p){
+    const t = ms/1000;
+    return { x: p.cx + p.Ax * p.pnX(t * p.fx),
+             y: p.cy + p.Ay * p.pnY(t * p.fy) };
+  }
+
+  // Animate the dot for 3s when capture starts, then reveal ring at the freeze point
+  window.addEventListener('trueping-capture-start', (e)=>{
+    const seed = e.detail.seed;
+    const startedAt = e.detail.startedAt;
+    const rect = stage.getBoundingClientRect();
+    const p = paramsFromSeed(seed, rect.width, rect.height);
+    let raf = null;
+    ring.style.opacity = '0';
+
+    function frame(t){
+      let elapsed = t - startedAt;
+      if (elapsed >= 3000){
+        elapsed = 3000;
+        const freeze = posAt(elapsed, p);
+        dot.style.left  = (freeze.x - 11) + 'px';
+        dot.style.top   = (freeze.y - 11) + 'px';
+        ring.style.left = (freeze.x - ring.offsetWidth/2) + 'px';
+        ring.style.top  = (freeze.y - ring.offsetHeight/2) + 'px';
+        ring.style.opacity = '1';
+        cancelAnimationFrame(raf);
+        return;
+      }
+      const xy = posAt(elapsed, p);
+      dot.style.left = (xy.x - 11) + 'px';
+      dot.style.top  = (xy.y - 11) + 'px';
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+  });
+  </script>
+
   <footer>
     © <span id="year"></span> RBC Roosendaal • Fan website
   </footer>
