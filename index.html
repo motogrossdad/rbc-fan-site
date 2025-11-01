@@ -7,39 +7,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#ffffff;
-      --card:#141a2f;
-      --accent:#f1942d;
+      --bg:#ffffff;       /* White background */
+      --card:#141a2f;     /* Dark navy cards */
+      --accent:#f1942d;   /* RBC orange */
       --muted:#94a3b8;
       --text:#0b1020;
-      --tp:#2b8;
+      --tp:#2b8;          /* TruePing brand */
     }
+    html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
-    header{position:sticky;top:0;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:10;}
+
+    /* ===== Navbar ===== */
+    header{position:sticky;top:0;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:5;}
     nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;}
     .brand{font-weight:800;font-size:1.1rem;display:flex;align-items:center;color:#fff;}
     .brand img{height:40px;margin-right:.5rem;border-radius:.25rem;}
     .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;}
     .links a:hover{opacity:.9;}
 
+    /* ===== Layout / cards ===== */
     .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:1100px;margin:1rem auto;padding:0 1rem;}
     .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;color:#fff;}
     .card h2{margin:0 0 .6rem;padding:.4rem .6rem;background:var(--accent);color:#fff;border-radius:.4rem;}
     h3{margin:.8rem 0 .4rem;color:var(--accent);}
 
+    /* Teletext iframes */
     .iframe-viewport{width:100%;height:70vh;border-radius:.8rem;background:#0e1224;border:0;overflow:hidden;margin-bottom:1rem;}
     .iframe-viewport iframe{width:100%;height:100%;border:0;}
 
+    /* Tables */
     .fixtures-wrapper{width:100%;overflow:auto;border-radius:.6rem;}
     table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;background:#1d2238;color:#fff;}
     table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
     table.fixtures th{background:var(--accent);color:#fff;font-weight:600;position:sticky;top:0;z-index:2;}
     table.fixtures td.opponent{color:var(--accent);font-weight:700;}
 
+    /* Next 5 box */
     #next5{background:#1d2238;padding:1rem;border-radius:.6rem;color:#fff;}
     #next5 ul{margin:0;padding-left:1.2rem;}
     #next5 h3{margin-top:0;}
 
+    /* Squad */
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
     .player{background:rgba(255,255,255,.05);border-radius:.6rem;padding:.6rem;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
     .player:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.4);}
@@ -48,11 +56,29 @@
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
 
-    /* TruePing card */
-    .tp-box{background:#0f142b;border:1px solid rgba(255,255,255,.08);border-radius:.8rem;padding:1rem;}
+    /* ===== Footer ===== */
+    footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
+
+    /* ===== GATE (full-screen overlay) ===== */
+    .tp-gate{
+      position:fixed; inset:0; z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+      background:rgba(10,13,28,0.86); backdrop-filter: blur(4px);
+      transition:opacity .28s ease, visibility .28s ease;
+    }
+    .tp-gate.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+    .tp-card{
+      width:min(92vw,640px);
+      background:#0f142b; color:#fff;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; padding:16px;
+      box-shadow:0 12px 40px rgba(0,0,0,.35);
+    }
+    .tp-card h2{margin:0 0 .6rem; font-size:1.2rem; font-weight:800; background:none; color:#fff;}
+    .tp-sub{margin:.25rem 0 1rem; color:#cbd5e1; font-size:.95rem;}
     .tp-stage{
-      position:relative;width:100%;aspect-ratio:16/9;
-      border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;background:#fff;
+      position:relative; width:100%; aspect-ratio:16/9;
+      border:1px dashed #cbd5e1; border-radius:12px; overflow:hidden; background:#fff;
       touch-action:none; user-select:none;
     }
     .tp-grid line{stroke:#e2e8f0;stroke-dasharray:4 5;}
@@ -62,92 +88,24 @@
     @keyframes pulse{0%{transform:scale(0.9);opacity:.6}50%{transform:scale(1.05);opacity:1}100%{transform:scale(0.9);opacity:.6}}
     .tp-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
     .tp-btn{padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;cursor:pointer;}
-    .tp-status{text-align:center;margin-top:.5rem;font-weight:700;}
-    .tp-pre{background:#f9fafb;color:#0b1020;padding:10px;border-radius:8px;max-height:220px;overflow:auto;}
+    .tp-status{text-align:center;margin-top:.6rem;font-weight:800;}
+    .tp-pre{background:#0b1229;color:#e2e8f0;padding:10px;border-radius:8px;max-height:200px;overflow:auto;font-size:.8rem;}
+    .tp-help{margin-top:.5rem; font-size:.85rem; color:#cbd5e1; text-align:center;}
+    .tp-error{color:#fecaca; font-weight:700;}
 
-    footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
+    /* Hide site until unlocked */
+    #site{ visibility:hidden; }
+    #site.unlocked{ visibility:visible; }
   </style>
 </head>
 <body>
-  <header>
-    <nav>
-      <div class="brand">
-        <img src="./assets/logo.png" alt="RBC Logo" onerror="this.style.display='none'">
-        <span id="brand-text">RBC Roosendaal 25/26</span>
-      </div>
-      <div class="links">
-        <a href="#tables">Stand</a>
-        <a href="#fixtures">Programma</a>
-        <a href="#squad">Selectie</a>
-        <a href="#updates">Live</a>
-      </div>
-    </nav>
-  </header>
 
-  <main class="grid">
-    <!-- Standings and Results -->
-    <section class="card" id="tables">
-      <h2>Stand & Uitslagen</h2>
-      <h3>Stand</h3>
-      <div class="iframe-viewport">
-        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand"></iframe>
-      </div>
-      <h3>Uitslagen</h3>
-      <div class="iframe-viewport">
-        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
-      </div>
-    </section>
+  <!-- ========= TRUEPING GATE (overlay) ========= -->
+  <div id="tpGate" class="tp-gate" role="dialog" aria-modal="true" aria-labelledby="tpTitle">
+    <div class="tp-card">
+      <h2 id="tpTitle">TruePing — Human check</h2>
+      <div class="tp-sub">Volg de ring ~3s, klik dan in de ring. Geen puzzels — beweging bewijst dat je mens bent.</div>
 
-    <!-- Fixtures -->
-    <section class="card" id="fixtures">
-      <h2>Programma & Resultaten</h2>
-      <h3>KNVB Beker 2025/2026</h3>
-      <div class="fixtures-wrapper">
-        <table class="fixtures">
-          <thead>
-            <tr>
-              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
-            </tr>
-          </thead>
-          <tbody id="cup-body"></tbody>
-        </table>
-      </div>
-      <h3>Derde Divisie B 2025/2026</h3>
-      <div class="fixtures-wrapper">
-        <table class="fixtures">
-          <thead>
-            <tr>
-              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
-            </tr>
-          </thead>
-          <tbody id="league-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Next 5 -->
-    <section class="card">
-      <h2>Komende 5 wedstrijden</h2>
-      <div id="next5" class="muted">Laden…</div>
-    </section>
-
-    <!-- Squad -->
-    <section class="card" id="squad">
-      <h2>Selectie</h2>
-      <div class="squad" id="squad-list"></div>
-      <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
-    </section>
-
-    <!-- Live Updates -->
-    <section class="card" id="updates">
-      <h2>Live updates</h2>
-      <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
-      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </section>
-
-    <!-- TruePing Human Check -->
-    <section class="card tp-box" id="trueping-card">
-      <h2>TruePing — Human check</h2>
       <div class="tp-stage" id="trueping-stage" aria-label="TruePing test area">
         <svg class="tp-grid" width="100%" height="100%" viewBox="0 0 480 270" preserveAspectRatio="none" style="position:absolute;top:0;left:0;pointer-events:none;">
           <line x1="240" y1="0"   x2="240" y2="270"/>
@@ -157,12 +115,100 @@
         <div class="tp-ring" id="ring"></div>
         <div class="tp-center" id="tpCenter"><button class="tp-btn" id="tpStart">Start</button></div>
       </div>
-      <div id="tpStatus" class="tp-status">Gereed</div>
-      <pre id="tpOut" class="tp-pre"></pre>
-    </section>
-  </main>
 
-  <!-- Inline TruePing SDK (so we don't depend on an external file) -->
+      <div id="tpStatus" class="tp-status">Gereed</div>
+      <div class="tp-help">Problemen? Vernieuw de pagina of probeer opnieuw.</div>
+      <pre id="tpOut" class="tp-pre" style="display:none"></pre>
+    </div>
+  </div>
+
+  <!-- ========= SITE CONTENT (unlocked after PASS) ========= -->
+  <div id="site">
+    <header>
+      <nav>
+        <div class="brand">
+          <img src="./assets/logo.png" alt="RBC Logo" onerror="this.style.display='none'">
+          <span id="brand-text">RBC Roosendaal 25/26</span>
+        </div>
+        <div class="links">
+          <a href="#tables">Stand</a>
+          <a href="#fixtures">Programma</a>
+          <a href="#squad">Selectie</a>
+          <a href="#updates">Live</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="grid">
+      <!-- Standings and Results -->
+      <section class="card" id="tables">
+        <h2>Stand & Uitslagen</h2>
+        <h3>Stand</h3>
+        <div class="iframe-viewport">
+          <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand"></iframe>
+        </div>
+        <h3>Uitslagen</h3>
+        <div class="iframe-viewport">
+          <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
+        </div>
+      </section>
+
+      <!-- Fixtures -->
+      <section class="card" id="fixtures">
+        <h2>Programma & Resultaten</h2>
+        <h3>KNVB Beker 2025/2026</h3>
+        <div class="fixtures-wrapper">
+          <table class="fixtures">
+            <thead>
+              <tr>
+                <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+              </tr>
+            </thead>
+            <tbody id="cup-body"></tbody>
+          </table>
+        </div>
+        <h3>Derde Divisie B 2025/2026</h3>
+        <div class="fixtures-wrapper">
+          <table class="fixtures">
+            <thead>
+              <tr>
+                <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+              </tr>
+            </thead>
+            <tbody id="league-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Next 5 -->
+      <section class="card">
+        <h2>Komende 5 wedstrijden</h2>
+        <div id="next5" class="muted">Laden…</div>
+      </section>
+
+      <!-- Squad -->
+      <section class="card" id="squad">
+        <h2>Selectie</h2>
+        <div class="squad" id="squad-list"></div>
+        <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
+      </section>
+
+      <!-- Live Updates -->
+      <section class="card" id="updates">
+        <h2>Live updates</h2>
+        <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      </section>
+    </main>
+
+    <footer>
+      © <span id="year"></span> RBC Roosendaal • Fan website
+    </footer>
+  </div>
+
+  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+
+  <!-- ========= Inline TruePing SDK (no external file) ========= -->
   <script>
   (function(global){
     function now(){ return performance.now(); }
@@ -188,7 +234,7 @@
           raw.push({ t: now(), x: x-rect.left, y: y-rect.top });
           const last = events[events.length-1];
           if(!last || last.type!=='move' || (now() - (last._t||0)) > 16){
-            events.push({ type:'move', dt_ms: Math.round(now() - startedAt), x: x-rect.left, y: y-rect.top, _t: now() });
+            events.push({ type:'move', dt_ms: Math.round(now() - startedAt), x: x-rect.left, y: y-rect-top, _t: now() });
             if(events.length > maxMoves) events.splice(1,1);
           }
         }
@@ -259,14 +305,13 @@
 
     class TruePing {
       constructor({ endpoint, stageSelector='#trueping-stage', trackMs=3000, clickWindow=2000, onTick=null } = {}){
-        this.endpoint = endpoint;
+        this.endpoint = endpoint || 'https://trueping.onrender.com';
         this.stageSelector = stageSelector;
         this.trackMs = trackMs;
         this.totalMs = trackMs + clickWindow;
         this.onTick = onTick;
       }
       async ping(){
-        // nonce + seed
         const metaRes = await fetch(this.endpoint + '/trueping/nonce');
         if(!metaRes.ok) throw new Error('nonce ' + metaRes.status);
         const { nonce, seed } = await metaRes.json();
@@ -300,9 +345,9 @@
   })(window);
   </script>
 
-  <!-- Gate logic + animation glue -->
+  <!-- ========= Gate logic + animation glue ========= -->
   <script>
-    // Perlin helpers for animating the dot
+    // Perlin helpers for animating the dot path in the gate
     function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n); return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n; const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
     function grad1(h){ return (h*2-1); }
     function fade(t){ return t*t*t*(t*(t*6-15)+10); }
@@ -312,6 +357,8 @@
     function posAt(ms, p){ const t = ms/1000; return { x: p.cx + p.Ax * p.pnX(t * p.fx), y: p.cy + p.Ay * p.pnY(t * p.fy) }; }
 
     const ENDPOINT = 'https://trueping.onrender.com';
+    const gate = document.getElementById('tpGate');
+    const site = document.getElementById('site');
     const stageEl = document.getElementById('trueping-stage');
     const dot = document.getElementById('dot');
     const ring = document.getElementById('ring');
@@ -358,35 +405,37 @@
       raf = requestAnimationFrame(frame);
     }
 
-    // Hook: when capture starts, we animate using the seed & start time
+    // Animate + hide Start during capture
     window.addEventListener('trueping-capture-start', (e)=>{
       center.style.display = 'none';
       restartAnim(e.detail.startedAt, e.detail.seed);
     });
 
-    // Start button → run TruePing
+    // Start → run TruePing
     startBtn.addEventListener('click', async () => {
-      statusEl.textContent = 'Running…';
+      statusEl.textContent = 'Bezig…';
       try {
         const { token, verify } = await tp.ping();
-        statusEl.textContent = verify.ok ? 'PASS' : 'FAIL';
-        outEl.textContent = JSON.stringify({ token, verify }, null, 2);
+        if (verify.ok) {
+          statusEl.textContent = 'PASS — welkom!';
+          // Unlock site
+          gate.classList.add('hidden');
+          site.classList.add('unlocked');
+        } else {
+          statusEl.innerHTML = '<span class="tp-error">FAIL — probeer opnieuw</span>';
+          center.style.display = 'flex';
+        }
+        // Optional: show token for debugging
+        // outEl.style.display='block'; outEl.textContent = JSON.stringify({ token, verify }, null, 2);
       } catch (e) {
         console.error(e);
-        statusEl.textContent = 'Error';
-      } finally {
+        statusEl.innerHTML = '<span class="tp-error">Fout — vernieuw of probeer opnieuw</span>';
         center.style.display = 'flex';
       }
     });
-  </script>
 
-  <footer>
-    © <span id="year"></span> RBC Roosendaal • Fan website
-  </footer>
-
-  <script>
-    document.getElementById('year').textContent=new Date().getFullYear();
+    // If you ever want to allow bypass (for admins/testing), uncomment:
+    // document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ gate.classList.add('hidden'); site.classList.add('unlocked'); }});
   </script>
-  <script src="./assets/script.js?v=1"></script>
 </body>
 </html>
