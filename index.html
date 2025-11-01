@@ -21,20 +21,25 @@
     .brand img{height:40px;margin-right:.5rem;border-radius:.25rem;}
     .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;}
     .links a:hover{opacity:.9;}
+
     .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:1100px;margin:1rem auto;padding:0 1rem;}
     .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;color:#fff;}
     .card h2{margin:0 0 .6rem;padding:.4rem .6rem;background:var(--accent);color:#fff;border-radius:.4rem;}
     h3{margin:.8rem 0 .4rem;color:var(--accent);}
+
     .iframe-viewport{width:100%;height:70vh;border-radius:.8rem;background:#0e1224;border:0;overflow:hidden;margin-bottom:1rem;}
     .iframe-viewport iframe{width:100%;height:100%;border:0;}
+
     .fixtures-wrapper{width:100%;overflow:auto;border-radius:.6rem;}
     table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;background:#1d2238;color:#fff;}
     table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
     table.fixtures th{background:var(--accent);color:#fff;font-weight:600;position:sticky;top:0;z-index:2;}
     table.fixtures td.opponent{color:var(--accent);font-weight:700;}
+
     #next5{background:#1d2238;padding:1rem;border-radius:.6rem;color:#fff;}
     #next5 ul{margin:0;padding-left:1.2rem;}
     #next5 h3{margin-top:0;}
+
     .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
     .player{background:rgba(255,255,255,.05);border-radius:.6rem;padding:.6rem;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
     .player:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.4);}
@@ -42,35 +47,28 @@
     .player h3{margin:.3rem 0;font-size:1rem;}
     .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
     .muted{color:var(--muted);}
-    footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
 
-    /* ===== TruePing Access Gate ===== */
-    body.locked { overflow:hidden; }
-    #tp-gate {
-      position: fixed; inset: 0; z-index: 9999;
-      background: radial-gradient(1200px 600px at 50% -10%, #162147 0%, #0b1020 40%, #060912 100%);
-      display:flex; align-items:center; justify-content:center;
+    /* TruePing card */
+    .tp-box{background:#0f142b;border:1px solid rgba(255,255,255,.08);border-radius:.8rem;padding:1rem;}
+    .tp-stage{
+      position:relative;width:100%;aspect-ratio:16/9;
+      border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;background:#fff;
+      touch-action:none; user-select:none;
     }
-    #tp-gate.hidden { opacity:0; pointer-events:none; transition:opacity .3s ease; }
-    .tp-gate-card{width:min(92vw,560px);background:#0f142b;color:#e5e7eb;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.45);}
-    .tp-gate-title{margin:0 0 6px;font-size:18px;font-weight:800;color:#fff;text-align:center;}
-    .tp-gate-sub{margin:0 0 12px;font-size:14px;color:#cbd5e1;text-align:center;}
-    .tp-stage{position:relative;width:100%;aspect-ratio:16/9;border:1px dashed #cbd5e1;border-radius:12px;overflow:hidden;background:#fff;touch-action:none;user-select:none;}
     .tp-grid line{stroke:#e2e8f0;stroke-dasharray:4 5;}
-    .tp-dot{position:absolute;width:22px;height:22px;border-radius:50%;background:#2b8;box-shadow:0 0 0 5px rgba(43,136,120,.22);pointer-events:none;}
-    .tp-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid #2b8;opacity:0;pointer-events:none;transform:scale(0.9);}
+    .tp-dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--tp);box-shadow:0 0 0 5px rgba(43,136,120,.22);pointer-events:none;}
+    .tp-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid var(--tp);opacity:0;pointer-events:none;transform:scale(0.9);}
     .tp-ring.ring-visible{opacity:1;animation:pulse 1s infinite ease-in-out;}
-    @keyframes pulse{0%{transform:scale(.9);opacity:.6}50%{transform:scale(1.05);opacity:1}100%{transform:scale(.9);opacity:.6}}
+    @keyframes pulse{0%{transform:scale(0.9);opacity:.6}50%{transform:scale(1.05);opacity:1}100%{transform:scale(0.9);opacity:.6}}
     .tp-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
     .tp-btn{padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;cursor:pointer;}
-    .tp-status{text-align:center;margin-top:8px;font-weight:700;color:#e2e8f0;}
-    .tp-toast{position:absolute;left:50%;top:10px;transform:translateX(-50%);padding:6px 10px;border-radius:999px;color:#fff;font-weight:700;font-size:12px;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;box-shadow:0 6px 18px rgba(0,0,0,0.2);z-index:3;}
-    .tp-toast.show{opacity:1;transform:translateX(-50%) translateY(4px);}
-    .tp-toast.pass{background:#10b981;}
-    .tp-toast.fail{background:#ef4444;}
+    .tp-status{text-align:center;margin-top:.5rem;font-weight:700;}
+    .tp-pre{background:#f9fafb;color:#0b1020;padding:10px;border-radius:8px;max-height:220px;overflow:auto;}
+
+    footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
   </style>
 </head>
-<body class="locked">
+<body>
   <header>
     <nav>
       <div class="brand">
@@ -87,64 +85,308 @@
   </header>
 
   <main class="grid">
+    <!-- Standings and Results -->
     <section class="card" id="tables">
       <h2>Stand & Uitslagen</h2>
-      <div class="iframe-viewport"><iframe src="https://teletekst-data.nos.nl/webplus?p=835-2"></iframe></div>
+      <h3>Stand</h3>
+      <div class="iframe-viewport">
+        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-2" title="NOS Teletekst — Stand"></iframe>
+      </div>
+      <h3>Uitslagen</h3>
+      <div class="iframe-viewport">
+        <iframe src="https://teletekst-data.nos.nl/webplus?p=835-1" title="NOS Teletekst — Uitslagen"></iframe>
+      </div>
     </section>
+
+    <!-- Fixtures -->
     <section class="card" id="fixtures">
       <h2>Programma & Resultaten</h2>
-      <div class="fixtures-wrapper"><table class="fixtures"><thead><tr><th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th></tr></thead><tbody id="league-body"></tbody></table></div>
+      <h3>KNVB Beker 2025/2026</h3>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <thead>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
+          </thead>
+          <tbody id="cup-body"></tbody>
+        </table>
+      </div>
+      <h3>Derde Divisie B 2025/2026</h3>
+      <div class="fixtures-wrapper">
+        <table class="fixtures">
+          <thead>
+            <tr>
+              <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
+            </tr>
+          </thead>
+          <tbody id="league-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Next 5 -->
+    <section class="card">
+      <h2>Komende 5 wedstrijden</h2>
+      <div id="next5" class="muted">Laden…</div>
+    </section>
+
+    <!-- Squad -->
+    <section class="card" id="squad">
+      <h2>Selectie</h2>
+      <div class="squad" id="squad-list"></div>
+      <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
+    </section>
+
+    <!-- Live Updates -->
+    <section class="card" id="updates">
+      <h2>Live updates</h2>
+      <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
+      <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </section>
+
+    <!-- TruePing Human Check -->
+    <section class="card tp-box" id="trueping-card">
+      <h2>TruePing — Human check</h2>
+      <div class="tp-stage" id="trueping-stage" aria-label="TruePing test area">
+        <svg class="tp-grid" width="100%" height="100%" viewBox="0 0 480 270" preserveAspectRatio="none" style="position:absolute;top:0;left:0;pointer-events:none;">
+          <line x1="240" y1="0"   x2="240" y2="270"/>
+          <line x1="0"   y1="135" x2="480" y2="135"/>
+        </svg>
+        <div class="tp-dot"  id="dot"></div>
+        <div class="tp-ring" id="ring"></div>
+        <div class="tp-center" id="tpCenter"><button class="tp-btn" id="tpStart">Start</button></div>
+      </div>
+      <div id="tpStatus" class="tp-status">Gereed</div>
+      <pre id="tpOut" class="tp-pre"></pre>
     </section>
   </main>
 
-  <!-- ===== TruePing Access Gate ===== -->
-  <div id="tp-gate" aria-modal="true">
-    <div class="tp-gate-card">
-      <h3 class="tp-gate-title">TruePing — Human Check</h3>
-      <p class="tp-gate-sub">Follow for ~3s, then click inside the ring. “Because puzzles are for bots.”</p>
-      <div class="tp-stage" id="trueping-stage">
-        <svg class="tp-grid" width="100%" height="100%" viewBox="0 0 480 270" preserveAspectRatio="none" style="position:absolute;top:0;left:0;pointer-events:none;">
-          <line x1="240" y1="0" x2="240" y2="270"/><line x1="0" y1="135" x2="480" y2="135"/>
-        </svg>
-        <div class="tp-dot" id="tpDot"></div>
-        <div class="tp-ring" id="tpRing"></div>
-        <div class="tp-center" id="tpCenter"><button class="tp-btn" id="tpStart">Start</button></div>
-        <div id="tpToast" class="tp-toast"></div>
-      </div>
-      <div id="tpStatus" class="tp-status">Gereed</div>
-    </div>
-  </div>
+  <!-- Inline TruePing SDK (so we don't depend on an external file) -->
+  <script>
+  (function(global){
+    function now(){ return performance.now(); }
+    function bufToHex(buf){ return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+    function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n); return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n; const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
+    function grad1(h){ return (h*2 - 1); }
+    function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function makePerlin1D(seed){ const rand = randFromSeed(seed); const G = new Float32Array(2048); for(let i=0;i<G.length;i++) G[i] = grad1(rand()); return function perlin1(x){ const i0 = Math.floor(x) % G.length; const i1 = (i0 + 1) % G.length; const t = x - Math.floor(x); const g0 = G[i0]*2-1, g1 = G[i1]*2-1; const n0 = g0 * (t); const n1 = g1 * (t-1); const u = fade(t); return lerp(n0, n1, u); }; }
 
-  <footer>© <span id="year"></span> RBC Roosendaal • Fan website</footer>
+    async function generateKeyPair(){ const kp = await crypto.subtle.generateKey({ name:'ECDSA', namedCurve:'P-256' }, true, ['sign','verify']); const pubJwk = await crypto.subtle.exportKey('jwk', kp.publicKey); return { kp, pubJwk }; }
 
-  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+    async function capturePerlinPaused(stageEl, seed, trackMs, totalMs, onTick){
+      const rect = stageEl.getBoundingClientRect();
+      const startedAt = now();
+      try{ window.dispatchEvent(new CustomEvent('trueping-capture-start', { detail:{ stageSelector:'#'+(stageEl.id||''), seed, startedAt } })); }catch(_){}
+      let clickedAt = 0;
+      const raw = []; const events = []; const maxMoves = 900;
 
-  <!-- TruePing SDK -->
-  <script src="https://trueping.onrender.com/trueping-sdk.js" async onload="initTruePingGate()"></script>
+      const moveH = (e)=>{
+        const x = e.clientX, y = e.clientY;
+        if(x>=rect.left && y>=rect.top && x<=rect.right && y<=rect.bottom){
+          raw.push({ t: now(), x: x-rect.left, y: y-rect.top });
+          const last = events[events.length-1];
+          if(!last || last.type!=='move' || (now() - (last._t||0)) > 16){
+            events.push({ type:'move', dt_ms: Math.round(now() - startedAt), x: x-rect.left, y: y-rect.top, _t: now() });
+            if(events.length > maxMoves) events.splice(1,1);
+          }
+        }
+      };
+      const downH = (e)=>{
+        const x = e.clientX, y = e.clientY;
+        if(x>=rect.left && y>=rect.top && x<=rect.right && y<=rect.bottom){
+          clickedAt = now();
+          events.push({ type:'down', dt_ms: Math.round(clickedAt - startedAt), x: x-rect.left, y: y-rect.top });
+          try{ stageEl.setPointerCapture(e.pointerId); }catch(_){}
+        }
+      };
+
+      window.addEventListener('mousemove', moveH, { passive:true });
+      window.addEventListener('pointermove', moveH, { passive:true });
+      window.addEventListener('pointerdown', downH, { passive:true });
+
+      const tEnd = startedAt + totalMs;
+      while(now() < tEnd){
+        if(typeof onTick==='function'){ onTick(Math.ceil((tEnd - now())/1000)); }
+        await new Promise(r=>setTimeout(r, 16));
+      }
+
+      window.removeEventListener('mousemove', moveH);
+      window.removeEventListener('pointermove', moveH);
+      window.removeEventListener('pointerdown', downH);
+
+      // entropy score
+      const entropy = (function(samples){
+        if(samples.length<5) return 0;
+        let vels = [], turns = [], gaps = [];
+        for(let i=1;i<samples.length;i++){
+          const a = samples[i-1], b = samples[i];
+          const dt = b.t - a.t; if(dt<=0) continue;
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const v = Math.hypot(dx,dy)/dt; vels.push(v);
+          gaps.push(dt);
+          if(i>=2){
+            const c = samples[i-2];
+            const v1x = a.x - c.x, v1y = a.y - c.y;
+            const v2x = b.x - a.x, v2y = b.y - a.y;
+            const dot = v1x*v2x + v1y*v2y;
+            const m1 = Math.hypot(v1x,v1y), m2 = Math.hypot(v2x,v2y);
+            const cos = (m1*m2>0)? Math.max(-1, Math.min(1, dot/(m1*m2))) : 1;
+            const ang = Math.acos(cos); turns.push(ang);
+          }
+        }
+        const mean=(arr)=>arr.reduce((a,b)=>a+b,0)/Math.max(1,arr.length);
+        const std=(arr)=>{ const m=mean(arr); return Math.sqrt(mean(arr.map(x=>(x-m)*(x-m)))); };
+        const vStd = std(vels), vMean = mean(vels);
+        const tStd = std(gaps), tMean = mean(gaps);
+        const turnMean = mean(turns);
+        let s = 0;
+        if(vMean>0 && vStd/vMean > 0.2) s += 0.45;
+        if(tMean>0 && tStd/tMean > 0.2) s += 0.35;
+        if(turnMean > 0.12) s += 0.20;
+        return Math.min(1, Math.max(0, s));
+      })(raw);
+
+      const reaction_ms = clickedAt ? Math.round(clickedAt - startedAt) : null;
+
+      return {
+        challenge: { seed, duration_ms: trackMs, stage: { w: rect.width|0, h: rect.height|0 }, stop_ms: trackMs, total_ms: totalMs },
+        signal: { sample_count: raw.length, reaction_ms, entropy },
+        trace: { events: events.map(e=> e._t ? ({type:e.type, dt_ms:e.dt_ms, x:e.x, y:e.y}) : e) }
+      };
+    }
+
+    class TruePing {
+      constructor({ endpoint, stageSelector='#trueping-stage', trackMs=3000, clickWindow=2000, onTick=null } = {}){
+        this.endpoint = endpoint;
+        this.stageSelector = stageSelector;
+        this.trackMs = trackMs;
+        this.totalMs = trackMs + clickWindow;
+        this.onTick = onTick;
+      }
+      async ping(){
+        // nonce + seed
+        const metaRes = await fetch(this.endpoint + '/trueping/nonce');
+        if(!metaRes.ok) throw new Error('nonce ' + metaRes.status);
+        const { nonce, seed } = await metaRes.json();
+
+        const stageEl = document.querySelector(this.stageSelector) || document.body;
+        const { challenge, signal, trace } = await capturePerlinPaused(stageEl, seed, this.trackMs, this.totalMs, this.onTick);
+
+        const { kp, pubJwk } = await generateKeyPair();
+        const payload = {
+          version: 'trueping-0.8.0',
+          nonce, issued_at: Date.now(),
+          origin: (window.location && window.location.origin) ? window.location.origin : '*',
+          challenge, signal, trace
+        };
+        const enc = new TextEncoder();
+        const bytes = enc.encode(JSON.stringify(payload));
+        const signature = await crypto.subtle.sign({ name:'ECDSA', hash:'SHA-256' }, kp.privateKey, bytes);
+        const sigHex = bufToHex(signature);
+        const token = { ...payload, public_key_jwk: pubJwk, signature: sigHex };
+
+        const verifyRes = await fetch(this.endpoint + '/trueping/verify', {
+          method: 'POST',
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({ token })
+        });
+        const verify = await verifyRes.json();
+        return { token, verify };
+      }
+    }
+    global.TruePing = TruePing;
+  })(window);
+  </script>
+
+  <!-- Gate logic + animation glue -->
+  <script>
+    // Perlin helpers for animating the dot
+    function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n); return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n; const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
+    function grad1(h){ return (h*2-1); }
+    function fade(t){ return t*t*t*(t*(t*6-15)+10); }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function makePerlin1D(seed){ const rand = randFromSeed(seed); const G = new Float32Array(2048); for(let i=0;i<G.length;i++) G[i] = grad1(rand()); return function perlin1(x){ const i0 = Math.floor(x) % G.length; const i1 = (i0 + 1) % G.length; const tt = x - Math.floor(x); const g0 = G[i0]*2-1, g1 = G[i1]*2-1; const n0 = g0 * (tt), n1 = g1 * (tt-1); const u = fade(tt); return lerp(n0, n1, u); }; }
+    function paramsFromSeed(seed, w, h){ const pnX = makePerlin1D(seed ^ 0x9e3779b9); const pnY = makePerlin1D(seed ^ 0x85ebca6b); const cx = w/2, cy = h/2; const Ax = Math.max(50, Math.min(w/2-16, 130)); const Ay = Math.max(40, Math.min(h/2-16, 100)); const fx = 0.6, fy = 0.8; return { cx, cy, Ax, Ay, fx, fy, pnX, pnY }; }
+    function posAt(ms, p){ const t = ms/1000; return { x: p.cx + p.Ax * p.pnX(t * p.fx), y: p.cy + p.Ay * p.pnY(t * p.fy) }; }
+
+    const ENDPOINT = 'https://trueping.onrender.com';
+    const stageEl = document.getElementById('trueping-stage');
+    const dot = document.getElementById('dot');
+    const ring = document.getElementById('ring');
+    const center = document.getElementById('tpCenter');
+    const startBtn = document.getElementById('tpStart');
+    const statusEl = document.getElementById('tpStatus');
+    const outEl = document.getElementById('tpOut');
+
+    const tp = new TruePing({
+      endpoint: ENDPOINT,
+      stageSelector: '#trueping-stage',
+      trackMs: 3000,
+      clickWindow: 2000,
+      onTick: null
+    });
+
+    let raf = null, t0 = null, trackMs = 3000;
+
+    function restartAnim(startedAt, seed){
+      const rect = stageEl.getBoundingClientRect();
+      const p = paramsFromSeed(seed, rect.width, rect.height);
+      if(raf) cancelAnimationFrame(raf);
+      t0 = startedAt;
+      ring.classList.remove('ring-visible');
+
+      function frame(t){
+        let elapsed = t - t0;
+        if(elapsed >= trackMs){
+          elapsed = trackMs;
+          const freeze = posAt(trackMs, p);
+          dot.style.left = (freeze.x - 11) + 'px';
+          dot.style.top  = (freeze.y - 11) + 'px';
+          ring.style.left = (freeze.x - ring.offsetWidth/2) + 'px';
+          ring.style.top  = (freeze.y - ring.offsetHeight/2) + 'px';
+          ring.classList.add('ring-visible');
+          return;
+        } else {
+          const xy = posAt(elapsed, p);
+          dot.style.left = (xy.x - 11) + 'px';
+          dot.style.top  = (xy.y - 11) + 'px';
+          raf = requestAnimationFrame(frame);
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    // Hook: when capture starts, we animate using the seed & start time
+    window.addEventListener('trueping-capture-start', (e)=>{
+      center.style.display = 'none';
+      restartAnim(e.detail.startedAt, e.detail.seed);
+    });
+
+    // Start button → run TruePing
+    startBtn.addEventListener('click', async () => {
+      statusEl.textContent = 'Running…';
+      try {
+        const { token, verify } = await tp.ping();
+        statusEl.textContent = verify.ok ? 'PASS' : 'FAIL';
+        outEl.textContent = JSON.stringify({ token, verify }, null, 2);
+      } catch (e) {
+        console.error(e);
+        statusEl.textContent = 'Error';
+      } finally {
+        center.style.display = 'flex';
+      }
+    });
+  </script>
+
+  <footer>
+    © <span id="year"></span> RBC Roosendaal • Fan website
+  </footer>
 
   <script>
-  function randFromSeed(seed){let s=BigInt(seed)&((1n<<64n)-1n);return()=>{s^=s>>12n;s^=s<<25n;s^=s>>27n;const r=Number((s*2685821657736338717n)&((1n<<64n)-1n));return(r>>>0)/4294967295;};}
-  function grad1(h){return(h*2-1);}function fade(t){return t*t*t*(t*(t*6-15)+10);}function lerp(a,b,t){return a+(b-a)*t;}
-  function makePerlin1D(seed){const rand=randFromSeed(seed);const G=new Float32Array(2048);for(let i=0;i<G.length;i++)G[i]=grad1(rand());return function perlin1(x){const i0=Math.floor(x)%G.length;const i1=(i0+1)%G.length;const tt=x-Math.floor(x);const g0=G[i0]*2-1,g1=G[i1]*2-1;const n0=g0*(tt),n1=g1*(tt-1);const u=fade(tt);return lerp(n0,n1,u);};}
-  function paramsFromSeed(seed,w,h){const pnX=makePerlin1D(seed^0x9e3779b9);const pnY=makePerlin1D(seed^0x85ebca6b);const cx=w/2,cy=h/2;const Ax=Math.max(50,Math.min(w/2-16,130));const Ay=Math.max(40,Math.min(h/2-16,100));const fx=0.6,fy=0.8;return{cx,cy,Ax,Ay,fx,fy,pnX,pnY};}
-  function posAt(ms,p){const t=ms/1000;return{x:p.cx+p.Ax*p.pnX(t*p.fx),y:p.cy+p.Ay*p.pnY(t*p.fy)};}
-
-  function initTruePingGate(){
-    if(!window.TruePing){console.error('SDK missing');return;}
-    const ENDPOINT='https://trueping.onrender.com';
-    const gate=document.getElementById('tp-gate'),stage=document.getElementById('trueping-stage');
-    const dot=document.getElementById('tpDot'),ring=document.getElementById('tpRing');
-    const center=document.getElementById('tpCenter'),start=document.getElementById('tpStart');
-    const status=document.getElementById('tpStatus'),toast=document.getElementById('tpToast');
-    let raf=null,t0=null,trackMs=3000;
-    function showToast(t,k){toast.textContent=t;toast.className='tp-toast '+(k==='pass'?'pass':'fail')+' show';setTimeout(()=>toast.classList.remove('show'),1400);}
-    function restartAnim(startedAt,seed){const r=stage.getBoundingClientRect();const p=paramsFromSeed(seed,r.width,r.height);if(raf)cancelAnimationFrame(raf);t0=startedAt;ring.classList.remove('ring-visible');
-      function frame(t){let e=t-t0;if(e>=trackMs){e=trackMs;const f=posAt(trackMs,p);dot.style.left=(f.x-11)+'px';dot.style.top=(f.y-11)+'px';ring.style.left=(f.x-ring.offsetWidth/2)+'px';ring.style.top=(f.y-ring.offsetHeight/2)+'px';ring.classList.add('ring-visible');return;}
-      const xy=posAt(e,p);dot.style.left=(xy.x-11)+'px';dot.style.top=(xy.y-11)+'px';raf=requestAnimationFrame(frame);}raf=requestAnimationFrame(frame);}
-    const tp=new TruePing({endpoint:ENDPOINT,stageSelector:'#trueping-stage',trackMs:3000,clickWindow:2000});
-    window.addEventListener('trueping-capture-start',e=>{center.style.display='none';restartAnim(e.detail.startedAt,e.detail.seed);status.textContent='Bezig…';});
-    start.addEventListener('click',async()=>{status.textContent='Bezig…';try{const{token,verify}=await tp.ping();if(verify.ok){status.textContent='PASS ✓';showToast('PASS ✓','pass');setTimeout(()=>{gate.classList.add('hidden');document.body.classList.remove('locked');},400);}else{status.textContent='FAIL ✕';showToast('FAIL ✕','fail');center.style.display='flex';start.textContent='Retry';}}catch(e){console.error(e);status.textContent='Fout';center.style.display='flex';}});
-  }
+    document.getElementById('year').textContent=new Date().getFullYear();
   </script>
+  <script src="./assets/script.js?v=1"></script>
 </body>
 </html>
