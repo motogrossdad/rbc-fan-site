@@ -7,12 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#ffffff;       /* White background */
-      --card:#141a2f;     /* Dark navy cards */
-      --accent:#f1942d;   /* RBC orange */
+      --bg:#ffffff;
+      --card:#141a2f;
+      --accent:#f1942d;
       --muted:#94a3b8;
       --text:#0b1020;
-      --tp:#2b8;          /* TruePing brand */
+      --tp:#2b8;
     }
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
@@ -116,7 +116,7 @@
         <div class="tp-center" id="tpCenter"><button class="tp-btn" id="tpStart">Start</button></div>
       </div>
 
-      <div id="tpStatus" class="tp-status">Gereed</div>
+      <div id="tpStatus" class="tp-status">Laden…</div>
       <div class="tp-help">Problemen? Vernieuw de pagina of probeer opnieuw.</div>
       <pre id="tpOut" class="tp-pre" style="display:none"></pre>
     </div>
@@ -208,116 +208,108 @@
 
   <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 
-  <!-- ========= Inline TruePing SDK (no external file) ========= -->
+  <!-- ========= Inline TruePing SDK (allows passing nonce/seed) ========= -->
   <script>
   (function(global){
     function now(){ return performance.now(); }
     function bufToHex(buf){ return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
-    function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n); return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n; const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
-    function grad1(h){ return (h*2 - 1); }
-    function fade(t){ return t*t*t*(t*(t*6-15)+10); }
-    function lerp(a,b,t){ return a + (b-a)*t; }
-    function makePerlin1D(seed){ const rand = randFromSeed(seed); const G = new Float32Array(2048); for(let i=0;i<G.length;i++) G[i] = grad1(rand()); return function perlin1(x){ const i0 = Math.floor(x) % G.length; const i1 = (i0 + 1) % G.length; const t = x - Math.floor(x); const g0 = G[i0]*2-1, g1 = G[i1]*2-1; const n0 = g0 * (t); const n1 = g1 * (t-1); const u = fade(t); return lerp(n0, n1, u); }; }
 
-    async function generateKeyPair(){ const kp = await crypto.subtle.generateKey({ name:'ECDSA', namedCurve:'P-256' }, true, ['sign','verify']); const pubJwk = await crypto.subtle.exportKey('jwk', kp.publicKey); return { kp, pubJwk }; }
+    async function generateKeyPair(){
+      const kp = await crypto.subtle.generateKey({ name:'ECDSA', namedCurve:'P-256' }, true, ['sign','verify']);
+      const pubJwk = await crypto.subtle.exportKey('jwk', kp.publicKey);
+      return { kp, pubJwk };
+    }
 
-    async function capturePerlinPaused(stageEl, seed, trackMs, totalMs, onTick){
+    async function capture(stageSelector, seed, trackMs, totalMs, onTick){
+      const stageEl = document.querySelector(stageSelector) || document.body;
       const rect = stageEl.getBoundingClientRect();
       const startedAt = now();
-      try{ window.dispatchEvent(new CustomEvent('trueping-capture-start', { detail:{ stageSelector:'#'+(stageEl.id||''), seed, startedAt } })); }catch(_){}
+
+      // announce start so UI can animate with SAME seed
+      try{ window.dispatchEvent(new CustomEvent('trueping-capture-start', { detail:{ stageSelector, seed, startedAt } })); }catch(_){}
+
       let clickedAt = 0;
       const raw = []; const events = []; const maxMoves = 900;
 
-      const moveH = (e)=>{
-        const x = e.clientX, y = e.clientY;
-        if(x>=rect.left && y>=rect.top && x<=rect.right && y<=rect.bottom){
-          raw.push({ t: now(), x: x-rect.left, y: y-rect.top });
-          const last = events[events.length-1];
-          if(!last || last.type!=='move' || (now() - (last._t||0)) > 16){
-            events.push({ type:'move', dt_ms: Math.round(now() - startedAt), x: x-rect.left, y: y-rect-top, _t: now() });
-            if(events.length > maxMoves) events.splice(1,1);
-          }
+      const mkPt = (e)=>({ x:e.clientX-rect.left, y:e.clientY-rect.top, t:now() });
+      function pushMove(e){
+        const {x,y,t} = mkPt(e);
+        if(x<0||y<0||x>rect.width||y>rect.height) return;
+        raw.push({t,x,y});
+        const last = events[events.length-1];
+        if(!last || last.type!=='move' || (t-(last._t||0))>16){
+          events.push({ type:'move', dt_ms: Math.round(t - startedAt), x, y, _t:t });
+          if(events.length>maxMoves) events.splice(1,1);
         }
-      };
-      const downH = (e)=>{
-        const x = e.clientX, y = e.clientY;
-        if(x>=rect.left && y>=rect.top && x<=rect.right && y<=rect.bottom){
-          clickedAt = now();
-          events.push({ type:'down', dt_ms: Math.round(clickedAt - startedAt), x: x-rect.left, y: y-rect.top });
-          try{ stageEl.setPointerCapture(e.pointerId); }catch(_){}
-        }
-      };
+      }
+      function onDown(e){
+        const {x,y,t} = mkPt(e);
+        if(x<0||y<0||x>rect.width||y>rect.height) return;
+        clickedAt = t;
+        events.push({ type:'down', dt_ms: Math.round(t-startedAt), x, y });
+        try{ stageEl.setPointerCapture(e.pointerId); }catch(_){}
+      }
 
-      window.addEventListener('mousemove', moveH, { passive:true });
-      window.addEventListener('pointermove', moveH, { passive:true });
-      window.addEventListener('pointerdown', downH, { passive:true });
+      window.addEventListener('mousemove',  pushMove, { passive:true });
+      window.addEventListener('pointermove',pushMove, { passive:true });
+      window.addEventListener('pointerdown',onDown,   { passive:true });
 
       const tEnd = startedAt + totalMs;
       while(now() < tEnd){
         if(typeof onTick==='function'){ onTick(Math.ceil((tEnd - now())/1000)); }
-        await new Promise(r=>setTimeout(r, 16));
+        await new Promise(r=>setTimeout(r,16));
       }
 
-      window.removeEventListener('mousemove', moveH);
-      window.removeEventListener('pointermove', moveH);
-      window.removeEventListener('pointerdown', downH);
+      window.removeEventListener('mousemove',  pushMove);
+      window.removeEventListener('pointermove',pushMove);
+      window.removeEventListener('pointerdown',onDown);
 
-      // entropy score
-      const entropy = (function(samples){
+      // light entropy score
+      function entropyScore(samples){
         if(samples.length<5) return 0;
-        let vels = [], turns = [], gaps = [];
+        const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+        const std=a=>{const m=mean(a); return Math.sqrt(mean(a.map(v=>(v-m)*(v-m))));}
+        let v=[], dt=[];
         for(let i=1;i<samples.length;i++){
-          const a = samples[i-1], b = samples[i];
-          const dt = b.t - a.t; if(dt<=0) continue;
-          const dx = b.x - a.x, dy = b.y - a.y;
-          const v = Math.hypot(dx,dy)/dt; vels.push(v);
-          gaps.push(dt);
-          if(i>=2){
-            const c = samples[i-2];
-            const v1x = a.x - c.x, v1y = a.y - c.y;
-            const v2x = b.x - a.x, v2y = b.y - a.y;
-            const dot = v1x*v2x + v1y*v2y;
-            const m1 = Math.hypot(v1x,v1y), m2 = Math.hypot(v2x,v2y);
-            const cos = (m1*m2>0)? Math.max(-1, Math.min(1, dot/(m1*m2))) : 1;
-            const ang = Math.acos(cos); turns.push(ang);
-          }
+          const a=samples[i-1], b=samples[i], d=b.t-a.t; if(d<=0) continue;
+          v.push(Math.hypot(b.x-a.x,b.y-a.y)/d); dt.push(d);
         }
-        const mean=(arr)=>arr.reduce((a,b)=>a+b,0)/Math.max(1,arr.length);
-        const std=(arr)=>{ const m=mean(arr); return Math.sqrt(mean(arr.map(x=>(x-m)*(x-m)))); };
-        const vStd = std(vels), vMean = mean(vels);
-        const tStd = std(gaps), tMean = mean(gaps);
-        const turnMean = mean(turns);
-        let s = 0;
-        if(vMean>0 && vStd/vMean > 0.2) s += 0.45;
-        if(tMean>0 && tStd/tMean > 0.2) s += 0.35;
-        if(turnMean > 0.12) s += 0.20;
-        return Math.min(1, Math.max(0, s));
-      })(raw);
+        const s1 = (std(v)/(mean(v)||1));
+        const s2 = (std(dt)/(mean(dt)||1));
+        return Math.max(0, Math.min(1, 0.5*s1 + 0.5*s2));
+      }
 
       const reaction_ms = clickedAt ? Math.round(clickedAt - startedAt) : null;
 
       return {
-        challenge: { seed, duration_ms: trackMs, stage: { w: rect.width|0, h: rect.height|0 }, stop_ms: trackMs, total_ms: totalMs },
-        signal: { sample_count: raw.length, reaction_ms, entropy },
-        trace: { events: events.map(e=> e._t ? ({type:e.type, dt_ms:e.dt_ms, x:e.x, y:e.y}) : e) }
+        challenge:{ seed, duration_ms: trackMs, stage:{ w:rect.width|0, h:rect.height|0 }, stop_ms: trackMs, total_ms: totalMs },
+        signal:{ sample_count: raw.length, reaction_ms, entropy: entropyScore(raw) },
+        trace:{ events: events.map(e=> e._t ? ({type:e.type, dt_ms:e.dt_ms, x:e.x, y:e.y}) : e) }
       };
     }
 
     class TruePing {
-      constructor({ endpoint, stageSelector='#trueping-stage', trackMs=3000, clickWindow=2000, onTick=null } = {}){
+      constructor({ endpoint, stageSelector='#trueping-stage', trackMs=3000, clickWindow=2000, onTick=null }={}){
         this.endpoint = endpoint || 'https://trueping.onrender.com';
         this.stageSelector = stageSelector;
         this.trackMs = trackMs;
+        this.clickWindow = clickWindow;
         this.totalMs = trackMs + clickWindow;
         this.onTick = onTick;
       }
-      async ping(){
-        const metaRes = await fetch(this.endpoint + '/trueping/nonce');
-        if(!metaRes.ok) throw new Error('nonce ' + metaRes.status);
-        const { nonce, seed } = await metaRes.json();
 
-        const stageEl = document.querySelector(this.stageSelector) || document.body;
-        const { challenge, signal, trace } = await capturePerlinPaused(stageEl, seed, this.trackMs, this.totalMs, this.onTick);
+      // NEW: accepts external nonce/seed (or fetches if omitted)
+      async ping({ nonce:nullNonce, seed:nullSeed } = {}){
+        let nonce = nullNonce, seed = nullSeed;
+        if(!nonce || !seed){
+          const meta = await fetch(this.endpoint + '/trueping/nonce');
+          if(!meta.ok) throw new Error('nonce '+meta.status);
+          const j = await meta.json();
+          nonce = j.nonce; seed = j.seed;
+        }
+
+        const { challenge, signal, trace } =
+          await capture(this.stageSelector, seed, this.trackMs, this.totalMs, this.onTick);
 
         const { kp, pubJwk } = await generateKeyPair();
         const payload = {
@@ -329,32 +321,38 @@
         const enc = new TextEncoder();
         const bytes = enc.encode(JSON.stringify(payload));
         const signature = await crypto.subtle.sign({ name:'ECDSA', hash:'SHA-256' }, kp.privateKey, bytes);
-        const sigHex = bufToHex(signature);
-        const token = { ...payload, public_key_jwk: pubJwk, signature: sigHex };
+        const token = { ...payload, public_key_jwk: pubJwk, signature: bufToHex(signature) };
 
         const verifyRes = await fetch(this.endpoint + '/trueping/verify', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
+          method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ token })
         });
         const verify = await verifyRes.json();
         return { token, verify };
       }
     }
+
     global.TruePing = TruePing;
   })(window);
   </script>
 
-  <!-- ========= Gate logic + animation glue ========= -->
+  <!-- ========= Gate logic: preload policy + nonce/seed; animate; ping with SAME seed ========= -->
   <script>
-    // Perlin helpers for animating the dot path in the gate
-    function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n); return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n; const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
+    // Perlin helpers for animating the dot path
+    function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n);
+      return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n;
+        const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
     function grad1(h){ return (h*2-1); }
     function fade(t){ return t*t*t*(t*(t*6-15)+10); }
     function lerp(a,b,t){ return a + (b-a)*t; }
-    function makePerlin1D(seed){ const rand = randFromSeed(seed); const G = new Float32Array(2048); for(let i=0;i<G.length;i++) G[i] = grad1(rand()); return function perlin1(x){ const i0 = Math.floor(x) % G.length; const i1 = (i0 + 1) % G.length; const tt = x - Math.floor(x); const g0 = G[i0]*2-1, g1 = G[i1]*2-1; const n0 = g0 * (tt), n1 = g1 * (tt-1); const u = fade(tt); return lerp(n0, n1, u); }; }
-    function paramsFromSeed(seed, w, h){ const pnX = makePerlin1D(seed ^ 0x9e3779b9); const pnY = makePerlin1D(seed ^ 0x85ebca6b); const cx = w/2, cy = h/2; const Ax = Math.max(50, Math.min(w/2-16, 130)); const Ay = Math.max(40, Math.min(h/2-16, 100)); const fx = 0.6, fy = 0.8; return { cx, cy, Ax, Ay, fx, fy, pnX, pnY }; }
-    function posAt(ms, p){ const t = ms/1000; return { x: p.cx + p.Ax * p.pnX(t * p.fx), y: p.cy + p.Ay * p.pnY(t * p.fy) }; }
+    function makePerlin1D(seed){ const rand = randFromSeed(seed); const G = new Float32Array(2048);
+      for(let i=0;i<G.length;i++) G[i] = grad1(rand()); return function perlin1(x){
+        const i0 = Math.floor(x)%G.length, i1=(i0+1)%G.length, tt=x-Math.floor(x);
+        const g0=G[i0]*2-1, g1=G[i1]*2-1; const n0=g0*(tt), n1=g1*(tt-1); const u=fade(tt); return lerp(n0,n1,u); }; }
+    function paramsFromSeed(seed, w, h){ const pnX=makePerlin1D(seed ^ 0x9e3779b9), pnY=makePerlin1D(seed ^ 0x85ebca6b);
+      const cx=w/2, cy=h/2, Ax=Math.max(50,Math.min(w/2-16,130)), Ay=Math.max(40,Math.min(h/2-16,100));
+      return { cx, cy, Ax, Ay, fx:0.6, fy:0.8, pnX, pnY }; }
+    function posAt(ms,p){ const t=ms/1000; return { x:p.cx+p.Ax*p.pnX(t*p.fx), y:p.cy+p.Ay*p.pnY(t*p.fy) }; }
 
     const ENDPOINT = 'https://trueping.onrender.com';
     const gate = document.getElementById('tpGate');
@@ -365,24 +363,36 @@
     const center = document.getElementById('tpCenter');
     const startBtn = document.getElementById('tpStart');
     const statusEl = document.getElementById('tpStatus');
-    const outEl = document.getElementById('tpOut');
 
-    const tp = new TruePing({
-      endpoint: ENDPOINT,
-      stageSelector: '#trueping-stage',
-      trackMs: 3000,
-      clickWindow: 2000,
-      onTick: null
-    });
+    const tp = new TruePing({ endpoint: ENDPOINT, stageSelector:'#trueping-stage', trackMs:3000, clickWindow:2000 });
 
-    let raf = null, t0 = null, trackMs = 3000;
+    // state
+    let policy = null;
+    let current = { nonce:null, seed:null };
+    let raf = null, t0 = null;
+    let trackMs = 3000, clickWin = 2000;
 
-    function restartAnim(startedAt, seed){
+    async function fetchJSON(url, init, timeoutMs=8000){
+      const t = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), timeoutMs));
+      const res = await Promise.race([fetch(url, init), t]);
+      if(!res.ok) throw new Error(`${res.status}`);
+      return res.json();
+    }
+    async function loadPolicy(){
+      policy = await fetchJSON(`${ENDPOINT}/trueping/policy`);
+      trackMs = policy.track_ms; clickWin = policy.click_window_ms;
+    }
+    async function loadNonceSeed(){
+      const j = await fetchJSON(`${ENDPOINT}/trueping/nonce`);
+      current.nonce = j.nonce; current.seed = j.seed;
+    }
+
+    function restartAnim(startedAt){
       const rect = stageEl.getBoundingClientRect();
-      const p = paramsFromSeed(seed, rect.width, rect.height);
+      const p = paramsFromSeed(current.seed, rect.width, rect.height);
       if(raf) cancelAnimationFrame(raf);
-      t0 = startedAt;
       ring.classList.remove('ring-visible');
+      t0 = startedAt;
 
       function frame(t){
         let elapsed = t - t0;
@@ -405,37 +415,50 @@
       raf = requestAnimationFrame(frame);
     }
 
-    // Animate + hide Start during capture
+    // Animate using the SAME seed when capture starts
     window.addEventListener('trueping-capture-start', (e)=>{
-      center.style.display = 'none';
-      restartAnim(e.detail.startedAt, e.detail.seed);
+      center.style.display = 'none'; // hide during run
+      restartAnim(e.detail.startedAt);
     });
 
-    // Start → run TruePing
-    startBtn.addEventListener('click', async () => {
+    // Boot: preload policy + nonce/seed and preview the exact path
+    (async function boot(){
+      try{
+        statusEl.textContent = 'Laden…';
+        await loadPolicy();
+        await loadNonceSeed();
+        statusEl.textContent = 'Gereed — klik Start';
+        // Preview the path users must follow (same seed)
+        restartAnim(performance.now());
+      }catch(e){
+        console.error(e);
+        statusEl.textContent = 'Kon policy/seed niet laden';
+      }
+    })();
+
+    // Start → run TruePing with SAME nonce/seed
+    startBtn.addEventListener('click', async ()=>{
       statusEl.textContent = 'Bezig…';
-      try {
-        const { token, verify } = await tp.ping();
-        if (verify.ok) {
+      try{
+        const { token, verify } = await tp.ping({ nonce: current.nonce, seed: current.seed });
+        if(verify.ok){
           statusEl.textContent = 'PASS — welkom!';
-          // Unlock site
           gate.classList.add('hidden');
           site.classList.add('unlocked');
-        } else {
+        }else{
           statusEl.innerHTML = '<span class="tp-error">FAIL — probeer opnieuw</span>';
           center.style.display = 'flex';
         }
-        // Optional: show token for debugging
-        // outEl.style.display='block'; outEl.textContent = JSON.stringify({ token, verify }, null, 2);
-      } catch (e) {
+      }catch(e){
         console.error(e);
         statusEl.innerHTML = '<span class="tp-error">Fout — vernieuw of probeer opnieuw</span>';
         center.style.display = 'flex';
+      }finally{
+        // Prepare next round
+        try{ await loadNonceSeed(); }catch(_){}
+        restartAnim(performance.now());
       }
     });
-
-    // If you ever want to allow bypass (for admins/testing), uncomment:
-    // document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ gate.classList.add('hidden'); site.classList.add('unlocked'); }});
   </script>
 </body>
 </html>
