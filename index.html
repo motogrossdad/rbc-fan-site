@@ -4,132 +4,240 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RBC Roosendaal 25/26</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#ffffff;
-      --card:#141a2f;
-      --accent:#f1942d;
-      --muted:#94a3b8;
-      --text:#0b1020;
-      --tp:#2b8;
+    :root {
+      --bg: #fdfaf6;
+      --text: #333;
+      --accent: #c08420;
+      --card-bg: #ffffff;
+      --border-color: #eee;
+      --muted: #888;
     }
-    html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);}
+    html, body {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4 {
+        font-family: 'Playfair Display', serif;
+        color: var(--accent);
+        margin: 1.5rem 0 1rem;
+    }
 
     /* ===== Navbar ===== */
-    header{position:sticky;top:0;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:5;}
-    nav{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;}
-    .brand{font-weight:800;font-size:1.1rem;display:flex;align-items:center;color:#fff;}
-    .brand img{height:40px;margin-right:.5rem;border-radius:.25rem;}
-    .links a{color:#fff;margin-left:1rem;text-decoration:none;font-weight:600;}
-    .links a:hover{opacity:.9;}
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      box-shadow: 0 2px 10px rgba(0,0,0,.05);
+      z-index: 5;
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 0;
+    }
+    nav {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 1rem;
+    }
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      color: var(--text);
+      margin-bottom: 1rem;
+      text-decoration: none;
+    }
+    .brand img {
+      height: 40px;
+      margin-right: .75rem;
+    }
+    .links a {
+      color: var(--text);
+      margin: 0 .75rem;
+      text-decoration: none;
+      font-weight: 600;
+      padding-bottom: 4px;
+      border-bottom: 2px solid transparent;
+      transition: border-color .2s;
+    }
+    .links a:hover {
+      border-bottom-color: var(--accent);
+    }
 
     /* ===== Layout / cards ===== */
-    .grid{display:grid;grid-template-columns:1fr;gap:1rem;max-width:1100px;margin:1rem auto;padding:0 1rem;}
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:.8rem;padding:1rem;color:#fff;}
-    .card h2{margin:0 0 .6rem;padding:.4rem .6rem;background:var(--accent);color:#fff;border-radius:.4rem;}
-    h3{margin:.8rem 0 .4rem;color:var(--accent);}
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: .5rem;
+      padding: 1.5rem;
+      color: var(--text);
+      box-shadow: 0 4px 15px rgba(0,0,0,.04);
+    }
+    .card h2 {
+      margin: 0 0 1rem;
+      padding: 0;
+      background: none;
+      color: var(--accent);
+      border-radius: 0;
+      border-bottom: 2px solid var(--accent);
+      display: inline-block;
+    }
 
     /* Teletext iframes */
-    .iframe-viewport{width:100%;height:70vh;border-radius:.8rem;background:#0e1224;border:0;overflow:hidden;margin-bottom:1rem;}
-    .iframe-viewport iframe{width:100%;height:100%;border:0;}
+    .iframe-viewport {
+      width: 100%;
+      height: 70vh;
+      border-radius: .4rem;
+      background: #f0f0f0;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .iframe-viewport iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
 
     /* Tables */
-    .fixtures-wrapper{width:100%;overflow:auto;border-radius:.6rem;}
-    table.fixtures{width:100%;border-collapse:collapse;font-size:0.9rem;min-width:680px;background:#1d2238;color:#fff;}
-    table.fixtures th,table.fixtures td{border:1px solid rgba(255,255,255,.15);padding:.5rem .6rem;text-align:center;}
-    table.fixtures th{background:var(--accent);color:#fff;font-weight:600;position:sticky;top:0;z-index:2;}
-    table.fixtures td.opponent{color:var(--accent);font-weight:700;}
+    .fixtures-wrapper {
+      width: 100%;
+      overflow: auto;
+      border-radius: .4rem;
+      border: 1px solid var(--border-color);
+    }
+    table.fixtures {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 680px;
+      background: var(--card-bg);
+      color: var(--text);
+    }
+    table.fixtures th, table.fixtures td {
+      border: 1px solid var(--border-color);
+      padding: .75rem .6rem;
+      text-align: center;
+    }
+    table.fixtures th {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    table.fixtures td.opponent {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    table.fixtures tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
 
     /* Next 5 box */
-    #next5{background:#1d2238;padding:1rem;border-radius:.6rem;color:#fff;}
-    #next5 ul{margin:0;padding-left:1.2rem;}
-    #next5 h3{margin-top:0;}
+    #next5 {
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: .4rem;
+      border: 1px solid var(--border-color);
+      color: var(--text);
+    }
+    #next5 ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      list-style-type: '→ ';
+    }
+    #next5 h3 {
+      margin-top: 0;
+    }
 
     /* Squad */
-    .squad{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem;}
-    .player{background:rgba(255,255,255,.05);border-radius:.6rem;padding:.6rem;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;}
-    .player:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.4);}
-    .player img{width:100%;border-radius:.6rem;margin-bottom:.5rem;display:block;}
-    .player h3{margin:.3rem 0;font-size:1rem;}
-    .player .badge{position:absolute;top:.5rem;left:.5rem;background:var(--accent);color:#fff;padding:.2rem .5rem;border-radius:.5rem;font-weight:700;font-size:.8rem;box-shadow:0 2px 6px rgba(0,0,0,.3);}
-    .muted{color:var(--muted);}
+    .squad {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+    .player {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: .4rem;
+      padding: .6rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .player:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    }
+    .player img {
+      width: 100%;
+      border-radius: .4rem;
+      margin-bottom: .5rem;
+      display: block;
+    }
+    .player h3 {
+      margin: .3rem 0;
+      font-size: 1rem;
+    }
+    .player .badge {
+      position: absolute;
+      top: .5rem;
+      left: .5rem;
+      background: var(--accent);
+      color: #fff;
+      padding: .2rem .5rem;
+      border-radius: .5rem;
+      font-weight: 700;
+      font-size: .8rem;
+    }
+    .muted {
+      color: var(--muted);
+    }
 
     /* ===== Footer ===== */
-    footer{text-align:center;background:var(--accent);color:#fff;padding:1rem;font-size:.9rem;margin-top:2rem;}
-
-    /* ===== GATE (full-screen overlay) ===== */
-    .tp-gate{
-      position:fixed; inset:0; z-index:9999;
-      display:flex; align-items:center; justify-content:center;
-      background:rgba(10,13,28,0.86); backdrop-filter: blur(4px);
-      transition:opacity .28s ease, visibility .28s ease;
+    footer {
+      text-align: center;
+      background: var(--text);
+      color: #fff;
+      padding: 1.5rem;
+      font-size: .9rem;
+      margin-top: 2rem;
     }
-    .tp-gate.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
-    .tp-card{
-      width:min(92vw,640px);
-      background:#0f142b; color:#fff;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px; padding:16px;
-      box-shadow:0 12px 40px rgba(0,0,0,.35);
-    }
-    .tp-card h2{margin:0 0 .6rem; font-size:1.2rem; font-weight:800; background:none; color:#fff;}
-    .tp-sub{margin:.25rem 0 1rem; color:#cbd5e1; font-size:.95rem;}
-    .tp-stage{
-      position:relative; width:100%; aspect-ratio:16/9;
-      border:1px dashed #cbd5e1; border-radius:12px; overflow:hidden; background:#fff;
-      touch-action:none; user-select:none;
-    }
-    .tp-grid line{stroke:#e2e8f0;stroke-dasharray:4 5;}
-    .tp-dot{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--tp);box-shadow:0 0 0 5px rgba(43,136,120,.22);pointer-events:none;}
-    .tp-ring{position:absolute;width:40px;height:40px;border-radius:50%;border:2px solid var(--tp);opacity:0;pointer-events:none;transform:scale(0.9);}
-    .tp-ring.ring-visible{opacity:1;animation:pulse 1s infinite ease-in-out;}
-    @keyframes pulse{0%{transform:scale(0.9);opacity:.6}50%{transform:scale(1.05);opacity:1}100%{transform:scale(0.9);opacity:.6}}
-    .tp-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
-    .tp-btn{padding:10px 14px;border-radius:999px;border:1px solid #0f766e;background:#ccfbf1;color:#0f766e;font-weight:700;cursor:pointer;}
-    .tp-status{text-align:center;margin-top:.6rem;font-weight:800;}
-    .tp-pre{background:#0b1229;color:#e2e8f0;padding:10px;border-radius:8px;max-height:200px;overflow:auto;font-size:.8rem;}
-    .tp-help{margin-top:.5rem; font-size:.85rem; color:#cbd5e1; text-align:center;}
-    .tp-error{color:#fecaca; font-weight:700;}
-
-    /* Hide site until unlocked */
-    #site{ visibility:hidden; }
-    #site.unlocked{ visibility:visible; }
   </style>
 </head>
 <body>
 
-  <!-- ========= TRUEPING GATE (overlay) ========= -->
-  <div id="tpGate" class="tp-gate" role="dialog" aria-modal="true" aria-labelledby="tpTitle">
-    <div class="tp-card">
-      <h2 id="tpTitle">TruePing — Human check</h2>
-      <div class="tp-sub">Volg de ring ~3s, klik dan in de ring. Geen puzzels — beweging bewijst dat je mens bent.</div>
-
-      <div class="tp-stage" id="trueping-stage" aria-label="TruePing test area">
-        <svg class="tp-grid" width="100%" height="100%" viewBox="0 0 480 270" preserveAspectRatio="none" style="position:absolute;top:0;left:0;pointer-events:none;">
-          <line x1="240" y1="0"   x2="240" y2="270"/>
-          <line x1="0"   y1="135" x2="480" y2="135"/>
-        </svg>
-        <div class="tp-dot"  id="dot"></div>
-        <div class="tp-ring" id="ring"></div>
-        <div class="tp-center" id="tpCenter"><button class="tp-btn" id="tpStart">Start</button></div>
-      </div>
-
-      <div id="tpStatus" class="tp-status">Laden…</div>
-      <div class="tp-help">Problemen? Vernieuw de pagina of probeer opnieuw.</div>
-      <pre id="tpOut" class="tp-pre" style="display:none"></pre>
-    </div>
-  </div>
-
-  <!-- ========= SITE CONTENT (unlocked after PASS) ========= -->
-  <div id="site">
+  <!-- ========= SITE CONTENT ========= -->
+  <div>
     <header>
       <nav>
-        <div class="brand">
+        <a href="#" class="brand">
           <img src="./assets/logo.png" alt="RBC Logo" onerror="this.style.display='none'">
           <span id="brand-text">RBC Roosendaal 25/26</span>
-        </div>
+        </a>
         <div class="links">
           <a href="#tables">Stand</a>
           <a href="#fixtures">Programma</a>
@@ -164,7 +272,9 @@
                 <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
               </tr>
             </thead>
-            <tbody id="cup-body"></tbody>
+            <tbody id="cup-body">
+              <tr><td>1e kwal.</td><td>23-09-2025</td><td>20:00</td><td>Uit</td><td class="opponent">GVVV</td><td>0 - 1</td></tr>
+            </tbody>
           </table>
         </div>
         <h3>Derde Divisie B 2025/2026</h3>
@@ -175,7 +285,26 @@
                 <th>Ronde</th><th>Datum</th><th>Tijd</th><th>Plaats</th><th>Tegenstander</th><th>Uitslag</th>
               </tr>
             </thead>
-            <tbody id="league-body"></tbody>
+            <tbody id="league-body">
+              <tr><td>1</td><td>16-08-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">Baronie</td><td>2 - 1</td></tr>
+              <tr><td>2</td><td>23-08-2025</td><td>18:00</td><td>Uit</td><td class="opponent">HSC '21</td><td>1 - 3</td></tr>
+              <tr><td>3</td><td>30-08-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">Staphorst</td><td>0 - 2</td></tr>
+              <tr><td>4</td><td>06-09-2025</td><td>15:00</td><td>Uit</td><td class="opponent">DOVO</td><td>0 - 1</td></tr>
+              <tr><td>5</td><td>13-09-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">Hoogeveen</td><td>1 - 1</td></tr>
+              <tr><td>6</td><td>20-09-2025</td><td>14:30</td><td>Uit</td><td class="opponent">Harkemase Boys</td><td>0 - 4</td></tr>
+              <tr><td>7</td><td>27-09-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">TEC</td><td>0 - 2</td></tr>
+              <tr><td>8</td><td>04-10-2025</td><td>14:30</td><td>Uit</td><td class="opponent">IJsselmeervogels</td><td>-</td></tr>
+              <tr><td>9</td><td>18-10-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">Sparta Nijkerk</td><td>-</td></tr>
+              <tr><td>10</td><td>25-10-2025</td><td>15:30</td><td>Uit</td><td class="opponent">Sportlust '46</td><td>-</td></tr>
+              <tr><td>11</td><td>01-11-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">DVS '33</td><td>-</td></tr>
+              <tr><td>12</td><td>08-11-2025</td><td>14:30</td><td>Uit</td><td class="opponent">Excelsior '31</td><td>-</td></tr>
+              <tr><td>13</td><td>22-11-2025</td><td>19:30</td><td>Thuis</td><td class="opponent">RKAV Volendam</td><td>-</td></tr>
+              <tr><td>14</td><td>29-11-2025</td><td>15:00</td><td>Uit</td><td class="opponent">Genemuiden</td><td>-</td></tr>
+              <tr><td>15</td><td>07-12-2025</td><td>14:00</td><td>Thuis</td><td class="opponent">Lisse</td><td>-</td></tr>
+              <tr><td>16</td><td>14-12-2025</td><td>14:00</td><td>Uit</td><td class="opponent">UDI'19</td><td>-</td></tr>
+              <tr><td>17</td><td>11-01-2026</td><td>14:30</td><td>Uit</td><td class="opponent">Meerssen</td><td>-</td></tr>
+              <tr><td>18</td><td>18-01-2026</td><td>14:00</td><td>Thuis</td><td class="opponent">VVSB</td><td>-</td></tr>
+            </tbody>
           </table>
         </div>
       </section>
@@ -183,20 +312,29 @@
       <!-- Next 5 -->
       <section class="card">
         <h2>Komende 5 wedstrijden</h2>
-        <div id="next5" class="muted">Laden…</div>
+        <div id="next5">
+            <h3>Volgende wedstrijden:</h3>
+            <ul>
+                <li><strong>07-12-2025:</strong> Thuis vs Lisse (14:00)</li>
+                <li><strong>14-12-2025:</strong> Uit vs UDI'19 (14:00)</li>
+                <li><strong>11-01-2026:</strong> Uit vs Meerssen (14:30)</li>
+                <li><strong>18-01-2026:</strong> Thuis vs VVSB (14:00)</li>
+                <li><strong>25-01-2026:</strong> Uit vs GOES</li>
+            </ul>
+        </div>
       </section>
 
       <!-- Squad -->
       <section class="card" id="squad">
         <h2>Selectie</h2>
         <div class="squad" id="squad-list"></div>
-        <p id="squad-empty" class="muted" style="display:none">Nog geen spelers toegevoegd.</p>
+        <p id="squad-empty" class="muted">Nog geen spelers toegevoegd.</p>
       </section>
 
       <!-- Live Updates -->
       <section class="card" id="updates">
         <h2>Live updates</h2>
-        <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
+        <a class="twitter-timeline" data-theme="light" href="https://twitter.com/RBCvoetbal?ref_src=twsrc%5Etfw">Tweets by @RBCvoetbal</a>
         <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
       </section>
     </main>
@@ -208,257 +346,5 @@
 
   <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
 
-  <!-- ========= Inline TruePing SDK (allows passing nonce/seed) ========= -->
-  <script>
-  (function(global){
-    function now(){ return performance.now(); }
-    function bufToHex(buf){ return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
-
-    async function generateKeyPair(){
-      const kp = await crypto.subtle.generateKey({ name:'ECDSA', namedCurve:'P-256' }, true, ['sign','verify']);
-      const pubJwk = await crypto.subtle.exportKey('jwk', kp.publicKey);
-      return { kp, pubJwk };
-    }
-
-    async function capture(stageSelector, seed, trackMs, totalMs, onTick){
-      const stageEl = document.querySelector(stageSelector) || document.body;
-      const rect = stageEl.getBoundingClientRect();
-      const startedAt = now();
-
-      // announce start so UI can animate with SAME seed
-      try{ window.dispatchEvent(new CustomEvent('trueping-capture-start', { detail:{ stageSelector, seed, startedAt } })); }catch(_){}
-
-      let clickedAt = 0;
-      const raw = []; const events = []; const maxMoves = 900;
-
-      const mkPt = (e)=>({ x:e.clientX-rect.left, y:e.clientY-rect.top, t:now() });
-      function pushMove(e){
-        const {x,y,t} = mkPt(e);
-        if(x<0||y<0||x>rect.width||y>rect.height) return;
-        raw.push({t,x,y});
-        const last = events[events.length-1];
-        if(!last || last.type!=='move' || (t-(last._t||0))>16){
-          events.push({ type:'move', dt_ms: Math.round(t - startedAt), x, y, _t:t });
-          if(events.length>maxMoves) events.splice(1,1);
-        }
-      }
-      function onDown(e){
-        const {x,y,t} = mkPt(e);
-        if(x<0||y<0||x>rect.width||y>rect.height) return;
-        clickedAt = t;
-        events.push({ type:'down', dt_ms: Math.round(t-startedAt), x, y });
-        try{ stageEl.setPointerCapture(e.pointerId); }catch(_){}
-      }
-
-      window.addEventListener('mousemove',  pushMove, { passive:true });
-      window.addEventListener('pointermove',pushMove, { passive:true });
-      window.addEventListener('pointerdown',onDown,   { passive:true });
-
-      const tEnd = startedAt + totalMs;
-      while(now() < tEnd){
-        if(typeof onTick==='function'){ onTick(Math.ceil((tEnd - now())/1000)); }
-        await new Promise(r=>setTimeout(r,16));
-      }
-
-      window.removeEventListener('mousemove',  pushMove);
-      window.removeEventListener('pointermove',pushMove);
-      window.removeEventListener('pointerdown',onDown);
-
-      // light entropy score
-      function entropyScore(samples){
-        if(samples.length<5) return 0;
-        const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
-        const std=a=>{const m=mean(a); return Math.sqrt(mean(a.map(v=>(v-m)*(v-m))));}
-        let v=[], dt=[];
-        for(let i=1;i<samples.length;i++){
-          const a=samples[i-1], b=samples[i], d=b.t-a.t; if(d<=0) continue;
-          v.push(Math.hypot(b.x-a.x,b.y-a.y)/d); dt.push(d);
-        }
-        const s1 = (std(v)/(mean(v)||1));
-        const s2 = (std(dt)/(mean(dt)||1));
-        return Math.max(0, Math.min(1, 0.5*s1 + 0.5*s2));
-      }
-
-      const reaction_ms = clickedAt ? Math.round(clickedAt - startedAt) : null;
-
-      return {
-        challenge:{ seed, duration_ms: trackMs, stage:{ w:rect.width|0, h:rect.height|0 }, stop_ms: trackMs, total_ms: totalMs },
-        signal:{ sample_count: raw.length, reaction_ms, entropy: entropyScore(raw) },
-        trace:{ events: events.map(e=> e._t ? ({type:e.type, dt_ms:e.dt_ms, x:e.x, y:e.y}) : e) }
-      };
-    }
-
-    class TruePing {
-      constructor({ endpoint, stageSelector='#trueping-stage', trackMs=3000, clickWindow=2000, onTick=null }={}){
-        this.endpoint = endpoint || 'https://trueping.onrender.com';
-        this.stageSelector = stageSelector;
-        this.trackMs = trackMs;
-        this.clickWindow = clickWindow;
-        this.totalMs = trackMs + clickWindow;
-        this.onTick = onTick;
-      }
-
-      // NEW: accepts external nonce/seed (or fetches if omitted)
-      async ping({ nonce:nullNonce, seed:nullSeed } = {}){
-        let nonce = nullNonce, seed = nullSeed;
-        if(!nonce || !seed){
-          const meta = await fetch(this.endpoint + '/trueping/nonce');
-          if(!meta.ok) throw new Error('nonce '+meta.status);
-          const j = await meta.json();
-          nonce = j.nonce; seed = j.seed;
-        }
-
-        const { challenge, signal, trace } =
-          await capture(this.stageSelector, seed, this.trackMs, this.totalMs, this.onTick);
-
-        const { kp, pubJwk } = await generateKeyPair();
-        const payload = {
-          version: 'trueping-0.8.0',
-          nonce, issued_at: Date.now(),
-          origin: (window.location && window.location.origin) ? window.location.origin : '*',
-          challenge, signal, trace
-        };
-        const enc = new TextEncoder();
-        const bytes = enc.encode(JSON.stringify(payload));
-        const signature = await crypto.subtle.sign({ name:'ECDSA', hash:'SHA-256' }, kp.privateKey, bytes);
-        const token = { ...payload, public_key_jwk: pubJwk, signature: bufToHex(signature) };
-
-        const verifyRes = await fetch(this.endpoint + '/trueping/verify', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ token })
-        });
-        const verify = await verifyRes.json();
-        return { token, verify };
-      }
-    }
-
-    global.TruePing = TruePing;
-  })(window);
-  </script>
-
-  <!-- ========= Gate logic: preload policy + nonce/seed; animate; ping with SAME seed ========= -->
-  <script>
-    // Perlin helpers for animating the dot path
-    function randFromSeed(seed){ let s = BigInt(seed) & ((1n<<64n)-1n);
-      return ()=>{ s^=s>>12n; s^=s<<25n; s^=s>>27n;
-        const r = Number((s*2685821657736338717n)&((1n<<64n)-1n)); return (r>>>0)/4294967295; }; }
-    function grad1(h){ return (h*2-1); }
-    function fade(t){ return t*t*t*(t*(t*6-15)+10); }
-    function lerp(a,b,t){ return a + (b-a)*t; }
-    function makePerlin1D(seed){ const rand = randFromSeed(seed); const G = new Float32Array(2048);
-      for(let i=0;i<G.length;i++) G[i] = grad1(rand()); return function perlin1(x){
-        const i0 = Math.floor(x)%G.length, i1=(i0+1)%G.length, tt=x-Math.floor(x);
-        const g0=G[i0]*2-1, g1=G[i1]*2-1; const n0=g0*(tt), n1=g1*(tt-1); const u=fade(tt); return lerp(n0,n1,u); }; }
-    function paramsFromSeed(seed, w, h){ const pnX=makePerlin1D(seed ^ 0x9e3779b9), pnY=makePerlin1D(seed ^ 0x85ebca6b);
-      const cx=w/2, cy=h/2, Ax=Math.max(50,Math.min(w/2-16,130)), Ay=Math.max(40,Math.min(h/2-16,100));
-      return { cx, cy, Ax, Ay, fx:0.6, fy:0.8, pnX, pnY }; }
-    function posAt(ms,p){ const t=ms/1000; return { x:p.cx+p.Ax*p.pnX(t*p.fx), y:p.cy+p.Ay*p.pnY(t*p.fy) }; }
-
-    const ENDPOINT = 'https://trueping.onrender.com';
-    const gate = document.getElementById('tpGate');
-    const site = document.getElementById('site');
-    const stageEl = document.getElementById('trueping-stage');
-    const dot = document.getElementById('dot');
-    const ring = document.getElementById('ring');
-    const center = document.getElementById('tpCenter');
-    const startBtn = document.getElementById('tpStart');
-    const statusEl = document.getElementById('tpStatus');
-
-    const tp = new TruePing({ endpoint: ENDPOINT, stageSelector:'#trueping-stage', trackMs:3000, clickWindow:2000 });
-
-    // state
-    let policy = null;
-    let current = { nonce:null, seed:null };
-    let raf = null, t0 = null;
-    let trackMs = 3000, clickWin = 2000;
-
-    async function fetchJSON(url, init, timeoutMs=8000){
-      const t = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), timeoutMs));
-      const res = await Promise.race([fetch(url, init), t]);
-      if(!res.ok) throw new Error(`${res.status}`);
-      return res.json();
-    }
-    async function loadPolicy(){
-      policy = await fetchJSON(`${ENDPOINT}/trueping/policy`);
-      trackMs = policy.track_ms; clickWin = policy.click_window_ms;
-    }
-    async function loadNonceSeed(){
-      const j = await fetchJSON(`${ENDPOINT}/trueping/nonce`);
-      current.nonce = j.nonce; current.seed = j.seed;
-    }
-
-    function restartAnim(startedAt){
-      const rect = stageEl.getBoundingClientRect();
-      const p = paramsFromSeed(current.seed, rect.width, rect.height);
-      if(raf) cancelAnimationFrame(raf);
-      ring.classList.remove('ring-visible');
-      t0 = startedAt;
-
-      function frame(t){
-        let elapsed = t - t0;
-        if(elapsed >= trackMs){
-          elapsed = trackMs;
-          const freeze = posAt(trackMs, p);
-          dot.style.left = (freeze.x - 11) + 'px';
-          dot.style.top  = (freeze.y - 11) + 'px';
-          ring.style.left = (freeze.x - ring.offsetWidth/2) + 'px';
-          ring.style.top  = (freeze.y - ring.offsetHeight/2) + 'px';
-          ring.classList.add('ring-visible');
-          return;
-        } else {
-          const xy = posAt(elapsed, p);
-          dot.style.left = (xy.x - 11) + 'px';
-          dot.style.top  = (xy.y - 11) + 'px';
-          raf = requestAnimationFrame(frame);
-        }
-      }
-      raf = requestAnimationFrame(frame);
-    }
-
-    // Animate using the SAME seed when capture starts
-    window.addEventListener('trueping-capture-start', (e)=>{
-      center.style.display = 'none'; // hide during run
-      restartAnim(e.detail.startedAt);
-    });
-
-    // Boot: preload policy + nonce/seed and preview the exact path
-    (async function boot(){
-      try{
-        statusEl.textContent = 'Laden…';
-        await loadPolicy();
-        await loadNonceSeed();
-        statusEl.textContent = 'Gereed — klik Start';
-        // Preview the path users must follow (same seed)
-        restartAnim(performance.now());
-      }catch(e){
-        console.error(e);
-        statusEl.textContent = 'Kon policy/seed niet laden';
-      }
-    })();
-
-    // Start → run TruePing with SAME nonce/seed
-    startBtn.addEventListener('click', async ()=>{
-      statusEl.textContent = 'Bezig…';
-      try{
-        const { token, verify } = await tp.ping({ nonce: current.nonce, seed: current.seed });
-        if(verify.ok){
-          statusEl.textContent = 'PASS — welkom!';
-          gate.classList.add('hidden');
-          site.classList.add('unlocked');
-        }else{
-          statusEl.innerHTML = '<span class="tp-error">FAIL — probeer opnieuw</span>';
-          center.style.display = 'flex';
-        }
-      }catch(e){
-        console.error(e);
-        statusEl.innerHTML = '<span class="tp-error">Fout — vernieuw of probeer opnieuw</span>';
-        center.style.display = 'flex';
-      }finally{
-        // Prepare next round
-        try{ await loadNonceSeed(); }catch(_){}
-        restartAnim(performance.now());
-      }
-    });
-  </script>
 </body>
 </html>
