@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Birds Park — Demo</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; }
+  </style>
+</head>
+<body>
+
+  <div id="container" style="display: flex; width: 100%; height: 830px; flex-direction: column; overflow: hidden;">
+    <iframe id="inlineFrame" src="https://birdspark.my.canva.site/" title="Inline Frame Example" style="flex-grow: 1; border: none; margin: 0; padding: 0;"></iframe>
+  </div>
+
+  <!-- start Convious Code -->
+  <script id="convious_loader" src="https://client.convious-app.com/loader.js?k=birds_park_test"></script>
+  <!-- end Convious Code -->
+
+  <div>
+    <input type="text" id="url" name="url" placeholder="Park's url">
+  </div>
+  <div>
+    <button onclick="(function(){ let url = document.getElementById('url').value; if(!url){ return } const container = document.getElementById('container'); container.style.height= window.innerHeight+'px'; const iframe = document.getElementById('inlineFrame'); if (!url.startsWith('http')){ url='https://'+url } iframe.src=encodeURI(url); })();">Use url</button>
+    <button onclick="(function(){ window.open('https://www.google.com/search?q=%22'+encodeURI(document.getElementById('url').value)+'%22&btnI','_blank'); document.getElementById('url').value=''; })();">Search</button>
+  </div>
+
+</body>
+</html>
